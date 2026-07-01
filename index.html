@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Số hóa Di tích Lịch sử Dinh Tỉnh Trưởng tỉnh Phước Thành (Nhà truyền thống Phú Giáo) — Mô hình tương tác 3D và Tư liệu Lịch sử" />
+  <title>Dinh Tỉnh Trưởng Phước Thành — Di Tích Lịch Sử Bình Dương</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Three.js import map -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>" />
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER — Heritage Archive Style
+============================================================ -->
+<header id="header">
+  <div class="header-inner">
+    <a href="#" class="logo" aria-label="Dinh Tỉnh Trưởng Phước Thành">
+      <div class="logo-icon">🏛️</div>
+      <span class="logo-text"><em data-i18n="logo_title">Dinh Tỉnh Trưởng Phước Thành</em></span>
+    </a>
+
+    <div class="nav-actions">
+      <button id="lang-toggle" aria-label="Switch language">EN/VN</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     QUICK INFO + 3D MODEL SECTION
+============================================================ -->
+<section id="quick-info-section">
+  <div class="container">
+    <div class="quick-info-grid">
+
+      <!-- Left: Quick Info Card -->
+      <div class="quick-info-left">
+        <div class="quick-info-card">
+          <h2 class="quick-info-title" data-i18n="quick_info_title">THÔNG TIN NHANH</h2>
+
+          <div class="info-row">
+            <span class="info-label" data-i18n="info_type_label">LOẠI HÌNH</span>
+            <span class="info-value" data-i18n="info_type">Di tích Lịch sử Văn hóa cấp Tỉnh</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label" data-i18n="info_year_label">THÀNH LẬP</span>
+            <span class="info-value" data-i18n="info_year">1956 (tỉnh Phước Thành)</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label" data-i18n="info_recognized_label">CÔNG NHẬN</span>
+            <span class="info-value" data-i18n="info_recognized">09/07/2004 — UBND tỉnh Bình Dương</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label" data-i18n="info_highlight_label">GIÁ TRỊ NỔI BẬT</span>
+            <span class="info-value" data-i18n="info_highlight">Chứng tích chiến tranh — nơi diễn ra Chiến thắng Phước Thành 18/9/1961...</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label" data-i18n="info_atmosphere_label">HIỆN TRẠNG</span>
+            <span class="info-value" data-i18n="info_atmosphere">Nhà Truyền Thống huyện Phú Giáo với 5 phòng trưng bày hiện vật.</span>
+          </div>
+        </div>
+
+        <!-- Heritage Mini Card -->
+        <div class="heritage-mini-card">
+          <div class="heritage-mini-content">
+            <div class="heritage-mini-label" data-i18n="heritage_label">Di Tích</div>
+            <div class="heritage-mini-text" data-i18n="heritage_mini_text">Di tích Lịch sử Văn hóa cấp Tỉnh — 2004</div>
+          </div>
+          <div class="heritage-mini-icon">🎖️</div>
+        </div>
+
+        <!-- Visit Info Card -->
+        <div class="visit-info-card">
+          <div class="visit-info-header" data-i18n="visit_info_title">THÔNG TIN THAM QUAN</div>
+          <div class="visit-info-item">
+            <span class="visit-icon">📍</span>
+            <span data-i18n="info_location">Ấp 7, xã Phú Giáo, huyện Phú Giáo, tỉnh Bình Dương</span>
+          </div>
+          <div class="visit-info-item">
+            <span class="visit-icon">🕐</span>
+            <span data-i18n="visit_hours">07:30 – 17:00 hàng ngày</span>
+          </div>
+          <div class="visit-info-item">
+            <span class="visit-icon">✅</span>
+            <span data-i18n="visit_free">Miễn phí tham quan</span>
+          </div>
+          <div class="visit-info-item">
+            <span class="visit-icon">👔</span>
+            <span data-i18n="visit_dress">Lưu ý trang phục trang nghiêm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: 3D Model Viewer -->
+      <div class="quick-info-right">
+        <div class="model-3d-wrapper" id="temple-3d-container">
+          <!-- Three.js canvas renders here -->
+          <div id="hotspot-overlay"></div>
+
+          <div class="model-3d-controls">
+            <button class="model-ctrl-btn" id="model-zoom-in" title="Zoom in">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </button>
+            <button class="model-ctrl-btn" id="model-zoom-out" title="Zoom out">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </button>
+            <button class="model-ctrl-btn" id="model-reset" title="Reset view">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+            </button>
+          </div>
+
+          <div class="model-drag-hint">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+            <span data-i18n="drag_hint">KÉO CHUỘT ĐỂ XOAY MÔ HÌNH 3D</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     HISTORY & STORY SECTION
+============================================================ -->
+<section id="history-section">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-tag" data-i18n="history_tag">Lịch Sử Hào Hùng</span>
+      <h2 class="section-title">
+        <span data-i18n="history_title">Chiến Thắng Phước Thành</span>
+      </h2>
+      <div class="gold-divider"></div>
+    </div>
+
+    <div class="history-grid">
+
+      <!-- Left: History Content -->
+      <div class="history-content">
+        <p data-i18n="history_body">
+          Dinh Tỉnh Trưởng tỉnh Phước Thành hay còn gọi là Nhà Truyền Thống huyện Phú Giáo, tọa lạc tại ấp 7, xã Phú Giáo, huyện Phú Giáo, tỉnh Bình Dương. Đây là chứng tích chiến tranh gắn liền với nhiều sự kiện lịch sử trọng đại, có ý nghĩa chính trị to lớn.
+        </p>
+        <p data-i18n="history_body2">
+          Đêm 17 rạng sáng ngày 18/9/1961, Tiểu đoàn 800 cùng bộ đội địa phương tỉnh Phước Thành đã tấn công tiêu diệt hoàn toàn Tiểu khu quân sự Phước Thành chỉ sau 1 giờ 30 phút chiến đấu. Đây là trận đánh đầu tiên của quân ta với quy mô lớn tại miền Nam giành thắng lợi hoàn toàn, đánh đòn phủ đầu vào chiến lược "chiến tranh đặc biệt" của Mỹ - Ngụy.
+        </p>
+        <p data-i18n="history_body3">
+          Chiến thắng Phước Thành đã giải phóng cơ quan đầu não tỉnh lỵ, phá tan hệ thống phòng thủ kiên cố của địch bao vây Chiến khu Đ. Sự kiện này là nguồn cổ vũ to lớn cho phong trào cách mạng kết hợp đấu tranh vũ trang nổi dậy khắp miền Nam lúc bấy giờ.
+        </p>
+      </div>
+
+      <!-- Right: Sidebar (Audio Guide) -->
+      <div class="history-sidebar">
+        <div class="audio-guide-card">
+          <div class="audio-guide-header" data-i18n="audio_guide_title">AUDIO GUIDE</div>
+          <div class="audio-guide-body">
+            <div class="audio-guide-icon">🎵</div>
+            <div class="audio-guide-info">
+              <div class="audio-guide-name" data-i18n="audio_track_name">Thuyết minh di tích</div>
+              <div class="audio-guide-duration">Thời lượng: 06:15</div>
+            </div>
+          </div>
+          <div class="audio-guide-controls">
+            <button class="audio-ctrl-btn">⏮</button>
+            <button class="audio-ctrl-btn audio-play-main" id="audio-play-main">▶</button>
+            <button class="audio-ctrl-btn">⏭</button>
+          </div>
+          <div class="audio-progress-bar">
+            <div class="audio-progress-fill" id="main-audio-progress"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Battle Statistics Summary -->
+    <div class="battle-stats reveal">
+      <div class="battle-stat-card">
+        <div class="battle-stat-number">~2.000</div>
+        <div class="battle-stat-label">Bị tiêu diệt &amp; Tan rã</div>
+      </div>
+      <div class="battle-stat-card">
+        <div class="battle-stat-number">300</div>
+        <div class="battle-stat-label">Tên bị diệt tại chỗ</div>
+      </div>
+      <div class="battle-stat-card">
+        <div class="battle-stat-number">400</div>
+        <div class="battle-stat-label">Súng thu giữ</div>
+      </div>
+      <div class="battle-stat-card">
+        <div class="battle-stat-number">~300</div>
+        <div class="battle-stat-label">Tù nhân giải thoát</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     TIMELINE
+============================================================ -->
+<section id="timeline">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-tag" data-i18n="section_timeline">Dòng Thời Gian Lịch Sử</span>
+      <h2 class="section-title">
+        Hành Trình <span>Lịch Sử Phước Thành</span>
+      </h2>
+      <div class="gold-divider"></div>
+    </div>
+    <div id="timeline-container"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     EXHIBITION ROOMS SECTION
+============================================================ -->
+<section id="exhibits">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-tag" data-i18n="exhibit_tag">Phòng Trưng Bày</span>
+      <h2 class="section-title">
+        <span data-i18n="exhibit_title">5 Phòng Trưng Bày Hiện Vật</span>
+      </h2>
+      <div class="gold-divider"></div>
+      <p class="section-desc" data-i18n="exhibit_desc">
+        Nhà Truyền Thống huyện Phú Giáo hiện có 5 phòng trưng bày hiện vật, hình ảnh hào hùng tái hiện các giai đoạn lịch sử quan trọng.
+      </p>
+    </div>
+
+    <div class="exhibit-grid">
+      <!-- Room 1 -->
+      <div class="exhibit-card reveal" style="transition-delay:0.1s">
+        <div class="exhibit-card-img">🇫🇷</div>
+        <div class="exhibit-card-body">
+          <h3 data-i18n="exhibit1_title">Quê Hương &amp; Chống Pháp</h3>
+          <p data-i18n="exhibit1_desc">Trưng bày hình ảnh, hiện vật về quá trình hình thành vùng đất và con người Phước Thành xưa, Phú Giáo ngày nay.</p>
+        </div>
+      </div>
+      <!-- Room 2 -->
+      <div class="exhibit-card reveal" style="transition-delay:0.2s">
+        <div class="exhibit-card-img">🇺🇸</div>
+        <div class="exhibit-card-body">
+          <h3 data-i18n="exhibit2_title">Kháng Chiến Chống Mỹ</h3>
+          <p data-i18n="exhibit2_desc">Các hiện vật và hình ảnh về quá trình đấu tranh kháng chiến chống Mỹ cứu nước của quân dân Phước Thành.</p>
+        </div>
+      </div>
+      <!-- Room 3 -->
+      <div class="exhibit-card reveal" style="transition-delay:0.3s">
+        <div class="exhibit-card-img">📈</div>
+        <div class="exhibit-card-body">
+          <h3 data-i18n="exhibit3_title">Phú Giáo Phát Triển</h3>
+          <p data-i18n="exhibit3_desc">Quá trình phát triển của Phú Giáo từ khi tái lập huyện (1999) đến nay theo hướng công nghiệp hóa hiện đại hóa.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exhibit-grid-bottom">
+      <!-- Room 4 -->
+      <div class="exhibit-card reveal" style="transition-delay:0.4s">
+        <div class="exhibit-card-img">⛓️</div>
+        <div class="exhibit-card-body">
+          <h3 data-i18n="exhibit4_title">Ấp Chiến Lược Mỹ-Ngụy</h3>
+          <p data-i18n="exhibit4_desc">Trưng bày cảnh tra tấn tại cầu Sông Bé và mô hình dồn dân ấp chiến lược giai đoạn 1959-1961.</p>
+        </div>
+      </div>
+      <!-- Room 5 -->
+      <div class="exhibit-card reveal" style="transition-delay:0.5s">
+        <div class="exhibit-card-img">✌️</div>
+        <div class="exhibit-card-body">
+          <h3 data-i18n="exhibit5_title">Chiến Thắng Phước Thành</h3>
+          <p data-i18n="exhibit5_desc">Sa bàn trận đánh Phước Thành đêm 17 rạng sáng 18/9/1961 và các hiện vật, hình ảnh của trận đánh lịch sử.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     HOTSPOT MODAL (For 3D Model Details)
+============================================================ -->
+<div id="hotspot-modal" class="hotspot-modal" role="dialog" aria-modal="true">
+  <div class="hotspot-modal-overlay"></div>
+  <div class="hotspot-modal-card">
+    <div class="hotspot-modal-header">
+      <div class="hotspot-modal-header-overlay">
+        <h2 id="hotspot-modal-title"></h2>
+      </div>
+      <button id="hotspot-modal-close" aria-label="Đóng">✕</button>
+    </div>
+
+    <!-- Body content -->
+    <div class="hotspot-modal-body">
+      <p id="hotspot-modal-desc"></p>
+
+      <!-- Audio player -->
+      <div class="hotspot-audio-section">
+        <button class="hotspot-audio-play" id="hotspot-audio-play">▶</button>
+        <div class="hotspot-audio-info">
+          <div class="hotspot-audio-name" id="hotspot-audio-name">Audio Guide</div>
+          <div class="hotspot-audio-dur" id="hotspot-audio-dur">Thời lượng: 02:18</div>
+        </div>
+      </div>
+
+      <!-- Detail expand button -->
+      <button class="hotspot-detail-btn" id="hotspot-detail-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        <span data-i18n="detail_architecture">CHI TIẾT KIẾN TRÚC</span>
+      </button>
+
+      <!-- Architectural detail expand box -->
+      <div id="hotspot-modal-detail-box" class="hotspot-detail-box hidden"></div>
+    </div>
+
+    <audio id="hotspot-audio" preload="none"></audio>
+  </div>
+</div>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer>
+  <div class="footer-content">
+    <div class="footer-title" data-i18n="logo_title">Dinh Tỉnh Trưởng Phước Thành</div>
+    <div class="footer-desc">
+      Dự án số hóa di tích Dinh Tỉnh Trưởng tỉnh Phước Thành (Nhà truyền thống huyện Phú Giáo) nhằm lưu giữ, giáo dục và phát triển truyền thống cách mạng cho các thế hệ hôm nay và tương lai.
+    </div>
+    <div class="footer-bottom">
+      &copy; 2026 Di Tích Lịch Sử Phú Giáo. Xây dựng với tinh thần di sản <span class="footer-gold">★</span> Bình Dương.
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     SCRIPTS
+============================================================ -->
+<script src="js/translations.js"></script>
+<script src="js/map-data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
+<script type="module" src="js/temple-3d.js"></script>
+
+</body>
+</html>
