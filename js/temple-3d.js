@@ -194,7 +194,7 @@ const Temple3D = {
         const wallD = 0.05; // extremely thin to look completely flat and flush (no box backpack)
         const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
         const coverWallMat = new THREE.MeshStandardMaterial({
-          color: 0xA78D7D, // Matches the warm peach-terracotta plaster color of the GLB side walls
+          color: 0xE7D5BC, // Bright warm cream matching front facade color
           roughness: 0.9,
           metalness: 0.05
         });
