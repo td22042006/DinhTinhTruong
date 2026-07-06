@@ -163,18 +163,18 @@ const Temple3D = {
         this.scene.add(this.model);
 
         // Add a clean cream cover wall on the back (-Z) to hide mirrored front details (photo 2)
-        const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.95; // widened to fit the back facade width (+0.5 on each side)
+        const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.93; // narrowed by 0.2 on each side (ratio 0.93)
         const wallH = scaledBox.getSize(new THREE.Vector3()).y * 0.38; // lowered height to prevent roof clipping
-        const wallD = 5.4; // thickened to 5.4 (+1.2) to fully swallow the canopy
+        const wallD = 6.4; // thickened to 6.4 (+1.0) to fully swallow the canopy
         const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
         const coverWallMat = new THREE.MeshStandardMaterial({
-          color: 0xA78D7D, // Exact color sampled from the crop of the GLB model texture
+          color: 0xE7D5BC, // Bright warm cream skin tone matching the front facade
           roughness: 0.9,
           metalness: 0.05
         });
         const coverWall = new THREE.Mesh(coverWallGeo, coverWallMat);
         // Positioned lower in Y and adjusted in Z to blend seamlessly with the building core
-        coverWall.position.set(0, wallH / 2 + 0.1, -scaledBox.getSize(new THREE.Vector3()).z * 0.29);
+        coverWall.position.set(0, wallH / 2 + 0.1, -scaledBox.getSize(new THREE.Vector3()).z * 0.28);
         coverWall.castShadow = true;
         coverWall.receiveShadow = true;
         this.scene.add(coverWall);
