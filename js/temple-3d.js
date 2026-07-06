@@ -14,21 +14,22 @@ const Temple3D = {
   animationId: null,
   isInitialized: false,
 
-  // Colors designed to match the provided photos
+  // Colors matched precisely to the physical scale model photos
   COLORS: {
-    whiteWall:     0xEAD6B1, // Colonial pale yellow/cream matching the photo
-    roofRed:       0x9A5A44, // Brownish-terracotta red matching top-right photo
-    columnTerracotta: 0x903C2C, // Deep red-brown pillars/pilasters
-    shutterBrown:  0x5A3C28, // Dark brown wood
-    signBlue:      0x1E3B5C, // Dark blue sign board
-    textGold:      0xDCB35C, // Gold text color
-    groundStone:   0xBAB0A2, // Grey stone base
-    grassGreen:    0x4E723D, // Grass lawn
-    spireGrey:     0xEBDDBE, // Light cream/beige spire faces
-    spireTrim:     0x8B3E2F, // Trim red-brown for spire edges
-    clockBlack:    0x252528, // Black clock face
-    windowGlass:   0x222225, // Glass color
-    skyColor:      0xE8F2F7,
+    cream:        0xE8D5A8,  // Colonial cream/pale yellow walls
+    roofTerra:    0x8B4531,  // Brownish-terracotta roof tiles
+    roofRidge:    0x6B3522,  // Darker ridge lines on roof
+    pilaster:     0x7A3325,  // Deep red-brown pilasters/columns
+    shutterBrown: 0x4A2E1A,  // Dark brown wood shutters/louvers
+    signBlue:     0x1E3B5C,  // Dark blue sign board
+    textGold:     0xDCB35C,  // Gold text
+    stone:        0xB5AA98,  // Grey stone base
+    grass:        0x4E723D,  // Green grass/bushes
+    spire:        0xE5D5B8,  // Light cream spire
+    spireTrim:    0x8B4531,  // Terracotta trim on spire
+    clockBlack:   0x1A1A1A,  // Black clock face
+    windowDark:   0x2A2018,  // Very dark window glass
+    white:        0xF0E8D8,  // Off-white trim
   },
 
   init(containerId) {
@@ -36,19 +37,19 @@ const Temple3D = {
     if (!this.container) return;
 
     this.overlayContainer = document.getElementById('hotspot-overlay');
-    
+
     const w = this.container.clientWidth;
     const h = this.container.clientHeight;
 
     // Scene
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x1a1a2e);
-    this.scene.fog = new THREE.FogExp2(0x1a1a2e, 0.008);
+    this.scene.fog = new THREE.FogExp2(0x1a1a2e, 0.006);
 
-    // Camera - set to view the front-left/isometric angle like photo 2
-    this.camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 500);
-    this.camera.position.set(38, 22, 38);
-    this.camera.lookAt(0, 4, 0);
+    // Camera
+    this.camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 500);
+    this.camera.position.set(32, 20, 32);
+    this.camera.lookAt(0, 5, 0);
 
     // Renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -57,7 +58,7 @@ const Temple3D = {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.15;
+    this.renderer.toneMappingExposure = 1.1;
     this.container.appendChild(this.renderer.domElement);
 
     // Controls
@@ -65,27 +66,26 @@ const Temple3D = {
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.08;
     this.controls.maxPolarAngle = Math.PI / 2.1;
-    this.controls.minDistance = 15;
-    this.controls.maxDistance = 80;
-    this.controls.target.set(0, 4, 0);
+    this.controls.minDistance = 12;
+    this.controls.maxDistance = 70;
+    this.controls.target.set(0, 5, 0);
     this.controls.autoRotate = true;
     this.controls.autoRotateSpeed = 0.3;
 
     // Lighting
     this.addLighting();
 
-    // Build the Palace
+    // Build
     this.buildPalace();
 
-    // Create hotspot markers
+    // Hotspots
     this.createHotspots();
 
-    // Event listeners
+    // Events
     window.addEventListener('resize', () => this.onResize());
     this.renderer.domElement.addEventListener('click', (e) => this.onClick(e));
     this.renderer.domElement.addEventListener('mousemove', (e) => this.onMouseMove(e));
 
-    // Control buttons
     document.getElementById('model-zoom-in')?.addEventListener('click', () => {
       this.camera.position.multiplyScalar(0.85);
       this.controls.update();
@@ -95,48 +95,42 @@ const Temple3D = {
       this.controls.update();
     });
     document.getElementById('model-reset')?.addEventListener('click', () => {
-      this.camera.position.set(38, 22, 38);
-      this.controls.target.set(0, 4, 0);
+      this.camera.position.set(32, 20, 32);
+      this.controls.target.set(0, 5, 0);
       this.controls.update();
     });
 
     this.isInitialized = true;
-
-    // Start animation
     this.animate();
   },
 
   addLighting() {
-    // Ambient light - warm base
-    const ambient = new THREE.AmbientLight(0xFFF3E0, 0.65);
+    const ambient = new THREE.AmbientLight(0xFFF3E0, 0.6);
     this.scene.add(ambient);
 
-    // Sun directional light
-    const sun = new THREE.DirectionalLight(0xFFFFFF, 1.4);
-    sun.position.set(30, 40, 20);
+    const sun = new THREE.DirectionalLight(0xFFFFFF, 1.3);
+    sun.position.set(25, 35, 20);
     sun.castShadow = true;
     sun.shadow.mapSize.width = 2048;
     sun.shadow.mapSize.height = 2048;
-    sun.shadow.camera.left = -20;
-    sun.shadow.camera.right = 20;
-    sun.shadow.camera.top = 20;
-    sun.shadow.camera.bottom = -20;
+    sun.shadow.camera.left = -25;
+    sun.shadow.camera.right = 25;
+    sun.shadow.camera.top = 25;
+    sun.shadow.camera.bottom = -25;
     sun.shadow.camera.near = 0.5;
-    sun.shadow.camera.far = 150;
+    sun.shadow.camera.far = 120;
     sun.shadow.bias = -0.0005;
     this.scene.add(sun);
 
-    // Sky/Fill light - blue reflection
-    const skyLight = new THREE.HemisphereLight(0xCCE0FF, 0x8D7E6F, 0.4);
+    const skyLight = new THREE.HemisphereLight(0xCCE0FF, 0x8D7E6F, 0.35);
     this.scene.add(skyLight);
 
-    // Back light to separate model from background
-    const backLight = new THREE.DirectionalLight(0xFFDDA0, 0.5);
-    backLight.position.set(-30, 20, -20);
+    const backLight = new THREE.DirectionalLight(0xFFDDA0, 0.4);
+    backLight.position.set(-25, 18, -18);
     this.scene.add(backLight);
   },
 
-  // ============ MATERIAL HELPER ============
+  // ============ MATERIAL ============
   mat(color, opts = {}) {
     return new THREE.MeshStandardMaterial({
       color,
@@ -146,8 +140,8 @@ const Temple3D = {
     });
   },
 
-  // ============ BASIC GEOMETRY CREATORS ============
-  createBox(w, h, d, color, x, y, z, opts = {}) {
+  // ============ GEOMETRY HELPERS ============
+  box(w, h, d, color, x, y, z, opts = {}) {
     const geo = new THREE.BoxGeometry(w, h, d);
     const mesh = new THREE.Mesh(geo, this.mat(color, opts));
     mesh.position.set(x, y, z);
@@ -156,8 +150,8 @@ const Temple3D = {
     return mesh;
   },
 
-  createCylinder(rTop, rBot, h, color, x, y, z, segments = 16) {
-    const geo = new THREE.CylinderGeometry(rTop, rBot, h, segments);
+  cyl(rT, rB, h, color, x, y, z, seg = 16) {
+    const geo = new THREE.CylinderGeometry(rT, rB, h, seg);
     const mesh = new THREE.Mesh(geo, this.mat(color, { roughness: 0.5 }));
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
@@ -165,416 +159,414 @@ const Temple3D = {
     return mesh;
   },
 
-  // Helper to create recessed windows with shadow depth
-  createRecessedWindow(w, h, color, x, y, z, facing = 'Z') {
-    const group = new THREE.Group();
-    group.position.set(x, y, z);
+  // Unified hip roof mesh (no overlapping corners)
+  hipRoof(w, h, d, color, x, y, z) {
+    // Ridge runs along X axis. If w > d, ridge is longer. If w < d, ridge along Z.
+    const ridgeHalf = Math.max(0, (w - d) / 2);
 
-    if (facing === 'X') {
-      // Outer frame trim
-      const frame = this.createBox(0.12, h + 0.15, w + 0.15, this.COLORS.whiteWall, 0, 0, 0);
-      group.add(frame);
-      // Recessed shutter pane (sitting inside)
-      const pane = this.createBox(0.06, h, w, color, -0.04, 0, 0);
-      group.add(pane);
-    } else {
-      // Outer frame trim
-      const frame = this.createBox(w + 0.15, h + 0.15, 0.12, this.COLORS.whiteWall, 0, 0, 0);
-      group.add(frame);
-      // Recessed shutter pane (sitting inside)
-      const pane = this.createBox(w, h, 0.06, color, 0, 0, -0.04);
-      group.add(pane);
-    }
-
-    return group;
-  },
-
-  // Helper to create a single-mesh unified hip roof (mái bánh ú) to avoid overlapping corners
-  createHipRoof(w, h, d, color, x, y, z) {
-    const ridgeHalf = Math.max(0.1, (w - d) / 2);
-
-    const vertices = new Float32Array([
-      // Front Face (facing +Z)
-      -w/2, 0, d/2,
-      w/2, 0, d/2,
-      ridgeHalf, h, 0,
-
-      -w/2, 0, d/2,
-      ridgeHalf, h, 0,
-      -ridgeHalf, h, 0,
-
-      // Back Face (facing -Z)
-      w/2, 0, -d/2,
-      -w/2, 0, -d/2,
-      -ridgeHalf, h, 0,
-
-      w/2, 0, -d/2,
-      -ridgeHalf, h, 0,
-      ridgeHalf, h, 0,
-
-      // Left Face (facing -X)
-      -w/2, 0, -d/2,
-      -w/2, 0, d/2,
-      -ridgeHalf, h, 0,
-
-      // Right Face (facing +X)
-      w/2, 0, d/2,
-      w/2, 0, -d/2,
-      ridgeHalf, h, 0,
+    const verts = new Float32Array([
+      // Front face (+Z) - trapezoid split into 2 triangles
+      -w/2, 0,  d/2,    w/2, 0,  d/2,    ridgeHalf, h, 0,
+      -w/2, 0,  d/2,    ridgeHalf, h, 0,  -ridgeHalf, h, 0,
+      // Back face (-Z)
+       w/2, 0, -d/2,   -w/2, 0, -d/2,   -ridgeHalf, h, 0,
+       w/2, 0, -d/2,   -ridgeHalf, h, 0,  ridgeHalf, h, 0,
+      // Left face (-X) - triangle
+      -w/2, 0, -d/2,   -w/2, 0,  d/2,   -ridgeHalf, h, 0,
+      // Right face (+X) - triangle
+       w/2, 0,  d/2,    w/2, 0, -d/2,    ridgeHalf, h, 0,
+      // Bottom face (close the volume)
+      -w/2, 0, -d/2,    w/2, 0, -d/2,    w/2, 0,  d/2,
+      -w/2, 0, -d/2,    w/2, 0,  d/2,   -w/2, 0,  d/2,
     ]);
 
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
     geo.computeVertexNormals();
 
-    const mesh = new THREE.Mesh(geo, this.mat(color, { roughness: 0.75 }));
+    const mesh = new THREE.Mesh(geo, this.mat(color, { roughness: 0.72, side: THREE.DoubleSide }));
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     return mesh;
   },
 
-  // ============ PROCEDURAL PALACE GENERATOR ============
+  // Pyramid roof (4-sided cone aligned to square)
+  pyramid(size, h, color, x, y, z) {
+    const geo = new THREE.ConeGeometry(size * 0.707, h, 4);
+    const mesh = new THREE.Mesh(geo, this.mat(color, { roughness: 0.7 }));
+    mesh.position.set(x, y + h/2, z);
+    mesh.rotation.y = Math.PI / 4;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    return mesh;
+  },
+
+  // Recessed window (frame + recessed pane)
+  recessedWin(w, h, color, x, y, z, axis = 'Z') {
+    const g = new THREE.Group();
+    g.position.set(x, y, z);
+    const C = this.COLORS;
+
+    if (axis === 'X') {
+      g.add(this.box(0.12, h + 0.12, w + 0.12, C.white, 0, 0, 0));
+      g.add(this.box(0.06, h, w, color, -0.05, 0, 0));
+    } else {
+      g.add(this.box(w + 0.12, h + 0.12, 0.12, C.white, 0, 0, 0));
+      g.add(this.box(w, h, 0.06, color, 0, 0, -0.05));
+    }
+    return g;
+  },
+
+  // ============ BUILD THE PALACE ============
   buildPalace() {
     const C = this.COLORS;
 
-    // 1. BASE AND STONE PLATFORM (Bệ đá & Thảm cỏ)
-    // Large ground floor plane
+    // ---- GROUND ----
     const floorGeo = new THREE.PlaneGeometry(80, 80);
-    const floorMat = this.mat(0x1a1a2e, { roughness: 0.95 });
-    const floor = new THREE.Mesh(floorGeo, floorMat);
+    const floor = new THREE.Mesh(floorGeo, this.mat(0x1a1a2e, { roughness: 0.95 }));
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -0.1;
+    floor.position.y = -0.05;
     floor.receiveShadow = true;
     this.scene.add(floor);
 
-    // Stone retaining wall base (like Photo 4)
-    // Sized to fit the building (which is 24 x 10)
-    const baseW = 26;
-    const baseD = 12;
-    const baseH = 0.6;
-    const base = this.createBox(baseW, baseH, baseD, C.groundStone, 0, baseH / 2, 0);
-    this.scene.add(base);
+    // ---- STONE BASE PLATFORM ----
+    const baseW = 24;
+    const baseD = 13;
+    const baseH = 0.55;
+    this.scene.add(this.box(baseW, baseH, baseD, C.stone, 0, baseH/2, 0));
 
-    // Green grass band wrap around the stone base
-    const grass = this.createBox(baseW + 0.3, 0.12, baseD + 0.3, C.grassGreen, 0, baseH + 0.06, 0);
-    this.scene.add(grass);
+    // Green grass trim around base
+    this.scene.add(this.box(baseW + 0.4, 0.08, baseD + 0.4, C.grass, 0, baseH + 0.04, 0));
 
-    // Inner concrete walkway
-    const walkway = this.createBox(baseW - 0.2, 0.1, baseD - 0.2, 0xD0C8B8, 0, baseH + 0.1, 0);
-    this.scene.add(walkway);
+    // Inner walkway
+    this.scene.add(this.box(baseW - 0.3, 0.06, baseD - 0.3, 0xD2CAB8, 0, baseH + 0.08, 0));
 
-
-    // 2. MAIN BUILDING BODY (Tòa nhà chính)
-    // Symmetrical structure: width=22, depth=8, height=6.5
-    const bW = 22;
-    const bD = 8;
-    const bH = 6.2;
-    const bY = baseH + 0.1 + bH / 2; // Position on top of walkway
-    const mainBody = this.createBox(bW, bH, bD, C.whiteWall, 0, bY, 0, { roughness: 0.7 });
-    this.scene.add(mainBody);
-
-
-    // 3. FRONT PORTICO / ENTRANCE (Mái hiên và Cột trụ)
-    // Sits in the center front: width=8.5, depth=1.8, height=5.5
-    const pW = 8.5;
-    const pD = 1.8;
-    const pH = 5.2;
-    const pZ = bD/2 + pD/2; // Projected forward
-    const porticoY = baseH + 0.1 + pH / 2;
-
-    // Recessed entrance alcove (behind the columns)
-    const alcove = this.createBox(pW - 0.4, pH, pD, C.whiteWall, 0, porticoY, pZ - 0.2);
-    this.scene.add(alcove);
-
-    // Flat white canopy top over columns
-    const canopyH = 0.35;
-    const canopy = this.createBox(pW + 0.4, canopyH, pD + 0.4, C.whiteWall, 0, baseH + 0.1 + pH + canopyH/2, pZ);
-    this.scene.add(canopy);
-
-    // 8 terracotta-colored pillars (Hệ thống 8 cột trụ tròn sảnh trước)
-    const colR = 0.15;
-    const colH = pH - 0.1;
-    const colY = baseH + 0.1 + colH/2;
-    const colZ = pZ + pD/2 - 0.2;
-    const colCount = 8;
-    const colXSpacing = pW / (colCount - 1); // Spacing for 8 columns
-
-    for (let i = 0; i < colCount; i++) {
-      const cx = -pW/2 + i * colXSpacing;
-      // Circular column shaft
-      const col = this.createCylinder(colR, colR * 1.1, colH, C.columnTerracotta, cx, colY, colZ, 12);
-      this.scene.add(col);
-      // Column base collar (Stone gray square)
-      const baseCollar = this.createBox(colR*2.8, 0.15, colR*2.8, C.groundStone, cx, baseH + 0.1 + 0.075, colZ);
-      this.scene.add(baseCollar);
-      // Column top collar
-      const topCollar = this.createBox(colR*2.6, 0.1, colR*2.6, C.whiteWall, cx, baseH + 0.1 + colH - 0.05, colZ);
-      this.scene.add(topCollar);
-    }
-
-    // Entrance doors (Behind pillars, inside alcove)
-    const doorW = 1.4;
-    const doorH = 2.4;
-    const doorZ = pZ - 0.2 + pD/2 - 0.01;
-    // Central double door
-    this.scene.add(this.createBox(doorW, doorH, 0.1, C.shutterBrown, 0, baseH + 0.1 + doorH/2, doorZ));
-    // Side doors/windows under portico
-    this.scene.add(this.createBox(0.9, 2.0, 0.1, C.shutterBrown, -pW/3.2, baseH + 0.1 + 1.0, doorZ));
-    this.scene.add(this.createBox(0.9, 2.0, 0.1, C.shutterBrown, pW/3.2, baseH + 0.1 + 1.0, doorZ));
-
-
-    // 4. SIGN BOARD (Biển hiệu Dinh Tỉnh Trưởng)
-    // Dark blue sign with gold border details above columns
-    const signW = 3.6;
-    const signH = 0.55;
-    const signZ = colZ + 0.11;
-    const signY = baseH + 0.1 + pH - signH/2 - 0.2;
-    
-    const signBoard = this.createBox(signW, signH, 0.08, C.signBlue, 0, signY, signZ);
-    this.scene.add(signBoard);
-
-    // Gold inner text strip simulation
-    const signText = this.createBox(signW - 0.2, signH - 0.15, 0.02, C.textGold, 0, signY, signZ + 0.05);
-    this.scene.add(signText);
-
-
-    // 5. SYMMETRICAL FACADE DETAILS (Chi tiết mặt tiền hai bên)
-    // Symmetrical wings - Left & Right murals (tranh tường) and shutters
-    const wingX = 7.0; // Distance of wings from center
-    const muralW = 3.2;
-    const muralH = 1.5;
-    const muralY = bY - 0.4;
-    const muralZ = bD/2 + 0.06;
-
-    // Create left mural (Warm tones - red/brown theme)
-    const leftMural = this.createBox(muralW, muralH, 0.05, 0x8A453B, -wingX, muralY, muralZ);
-    this.scene.add(leftMural);
-    // Left mural white border frame
-    const leftFrame = this.createBox(muralW + 0.3, muralH + 0.3, 0.03, C.whiteWall, -wingX, muralY, muralZ - 0.02);
-    this.scene.add(leftFrame);
-
-    // Create right mural (Cool tones - blue/green theme)
-    const rightMural = this.createBox(muralW, muralH, 0.05, 0x3F6A75, wingX, muralY, muralZ);
-    this.scene.add(rightMural);
-    // Right mural white border frame
-    const rightFrame = this.createBox(muralW + 0.3, muralH + 0.3, 0.03, C.whiteWall, wingX, muralY, muralZ - 0.02);
-    this.scene.add(rightFrame);
-
-    // Wing pilasters (Dải cột bổ tường trang trí hai bên sườn cánh)
-    const pilW = 0.25;
-    const pilH = bH;
-    const pilD = 0.15;
-    const pilZ = bD/2 + pilD/2;
-    const pilY = baseH + 0.1 + pilH/2;
-
-    [-wingX - 1.8, -wingX + 1.8, wingX - 1.8, wingX + 1.8].forEach(px => {
-      const pilaster = this.createBox(pilW, pilH, pilD, C.columnTerracotta, px, pilY, pilZ);
-      this.scene.add(pilaster);
+    // Small green bushes at front corners
+    const bushY = baseH / 2;
+    [-baseW/2 + 1, baseW/2 - 1].forEach(bx => {
+      this.scene.add(this.box(1.5, 0.7, 0.8, 0x3D6B30, bx, bushY + 0.35, baseD/2 - 0.1, { roughness: 0.9 }));
     });
 
-    // Facade windows with dark wood shutters (Cửa sổ lá sách lún sâu vào trong)
-    // 2 windows on ground floor (below murals)
-    const winGW = 0.9;
-    const winGH = 1.3;
-    const winGY = baseH + 0.1 + winGH/2 + 0.3;
-    this.scene.add(this.createRecessedWindow(winGW, winGH, C.shutterBrown, -wingX, winGY, muralZ, 'Z'));
-    this.scene.add(this.createRecessedWindow(winGW, winGH, C.shutterBrown, wingX, winGY, muralZ, 'Z'));
+    const topBase = baseH + 0.1; // Y where building starts
 
-    // 2 windows on upper floor (above murals)
-    const winUY_wing = bY + bH/2 - 1.2;
-    this.scene.add(this.createRecessedWindow(winGW, winGH, C.shutterBrown, -wingX, winUY_wing, muralZ, 'Z'));
-    this.scene.add(this.createRecessedWindow(winGW, winGH, C.shutterBrown, wingX, winUY_wing, muralZ, 'Z'));
+    // ---- MAIN BUILDING BODY ----
+    // From photos: wider than deep, single story with tall walls
+    const bW = 20;   // width (X)
+    const bD = 9;    // depth (Z)
+    const bH = 5.5;  // height
+    const bY = topBase + bH / 2;
 
-    // 2 windows on upper floor (next to central tower)
-    const winUY = bY + bH/2 - 1.2;
-    const winUX = 4.2;
-    this.scene.add(this.createRecessedWindow(0.9, 1.4, C.shutterBrown, -winUX, winUY, muralZ, 'Z'));
-    this.scene.add(this.createRecessedWindow(0.9, 1.4, C.shutterBrown, winUX, winUY, muralZ, 'Z'));
+    this.scene.add(this.box(bW, bH, bD, C.cream, 0, bY, 0, { roughness: 0.72 }));
 
-    // Side windows (small slots on side walls - also recessed)
+    // White horizontal cornice band at top of walls (visible in all photos)
+    this.scene.add(this.box(bW + 0.3, 0.25, bD + 0.3, C.white, 0, topBase + bH, 0));
+    // White base band
+    this.scene.add(this.box(bW + 0.15, 0.2, bD + 0.15, C.white, 0, topBase + 0.1, 0));
+
+    // ---- FRONT PORTICO (Sảnh cột trước) ----
+    // Central entrance area that protrudes forward with columns
+    const pW = 7.5;   // portico width
+    const pD = 1.6;   // portico depth (how far it sticks out)
+    const pH = 5.0;   // portico height
+    const pZ = bD/2 + pD/2;
+
+    // Portico back wall (alcove behind columns)
+    this.scene.add(this.box(pW - 0.3, pH, pD - 0.2, C.cream, 0, topBase + pH/2, pZ - 0.3));
+
+    // Flat canopy/entablature on top of columns
+    this.scene.add(this.box(pW + 0.5, 0.3, pD + 0.5, C.white, 0, topBase + pH, pZ));
+
+    // 6 columns (matching front photo - ~6 visible columns)
+    const colCount = 6;
+    const colSpacing = (pW - 0.8) / (colCount - 1);
+    const colR = 0.18;
+    const colH = pH - 0.4;
+    const colZ = pZ + pD/2 - 0.15;
+
+    for (let i = 0; i < colCount; i++) {
+      const cx = -(pW - 0.8)/2 + i * colSpacing;
+      // Column shaft
+      this.scene.add(this.cyl(colR, colR * 1.1, colH, C.pilaster, cx, topBase + colH/2 + 0.1, colZ, 12));
+      // Column base
+      this.scene.add(this.box(colR * 3, 0.12, colR * 3, C.stone, cx, topBase + 0.06, colZ));
+      // Column capital
+      this.scene.add(this.box(colR * 2.8, 0.1, colR * 2.8, C.white, cx, topBase + colH + 0.05, colZ));
+    }
+
+    // Entrance doors (behind columns)
+    const doorZ = pZ + pD/2 - 0.02;
+    // Central double door
+    this.scene.add(this.box(1.3, 2.3, 0.08, C.shutterBrown, 0, topBase + 1.15, doorZ));
+    // Side doors
+    this.scene.add(this.box(0.8, 1.8, 0.08, C.shutterBrown, -2.2, topBase + 0.9, doorZ));
+    this.scene.add(this.box(0.8, 1.8, 0.08, C.shutterBrown,  2.2, topBase + 0.9, doorZ));
+
+    // ---- SIGN BOARD (Bien hieu) ----
+    const signY = topBase + pH - 0.4;
+    this.scene.add(this.box(3.2, 0.5, 0.06, C.signBlue, 0, signY, colZ + 0.1));
+    this.scene.add(this.box(2.9, 0.3, 0.02, C.textGold, 0, signY, colZ + 0.14));
+
+    // ---- FACADE PILASTERS (Tru bo tuong) ----
+    // Vertical red-brown strips on the facade, as seen in front photo
+    const pilH = bH;
+    const pilW = 0.22;
+    const pilD = 0.12;
+    const pilZ = bD/2 + pilD/2;
+    const pilY = topBase + pilH/2;
+
+    // Inner pilasters flanking portico
+    [-pW/2 - 0.3, pW/2 + 0.3].forEach(px => {
+      this.scene.add(this.box(pilW, pilH, pilD, C.pilaster, px, pilY, pilZ));
+    });
+
+    // Wing pilasters (2 on each wing, visible in front photo)
+    const wingPilasters = [-8.2, -6.0, 6.0, 8.2];
+    wingPilasters.forEach(px => {
+      this.scene.add(this.box(pilW, pilH, pilD, C.pilaster, px, pilY, pilZ));
+    });
+
+    // Corner pilasters on front corners
+    [-bW/2 + 0.12, bW/2 - 0.12].forEach(px => {
+      this.scene.add(this.box(pilW, pilH, pilD, C.pilaster, px, pilY, pilZ));
+    });
+
+    // ---- FRONT FACADE WINDOWS ----
+    // Ground floor windows on wings (2 per wing, 4 total)
+    const winW = 0.85;
+    const winH = 1.2;
+    const gndWinY = topBase + winH/2 + 0.4;
+    const facadeZ = bD/2 + 0.06;
+
+    // Left wing windows
+    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown, -7.1, gndWinY, facadeZ, 'Z'));
+    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown, -9.0, gndWinY, facadeZ, 'Z'));
+    // Right wing windows
+    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown,  7.1, gndWinY, facadeZ, 'Z'));
+    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown,  9.0, gndWinY, facadeZ, 'Z'));
+
+    // Upper floor windows on wings
+    const upWinY = topBase + bH - winH/2 - 0.5;
+    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown, -7.1, upWinY, facadeZ, 'Z'));
+    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown,  7.1, upWinY, facadeZ, 'Z'));
+
+    // ---- TRANH TUONG (Murals) on wings ----
+    // Left mural (warm tones)
+    const muralW = 2.8;
+    const muralH = 1.4;
+    const muralY = topBase + bH/2 + 0.2;
+    this.scene.add(this.box(muralW + 0.2, muralH + 0.2, 0.03, C.white, -7.1, muralY, facadeZ - 0.01));
+    this.scene.add(this.box(muralW, muralH, 0.04, 0x8A453B, -7.1, muralY, facadeZ + 0.01));
+
+    // Right mural (cool tones)
+    this.scene.add(this.box(muralW + 0.2, muralH + 0.2, 0.03, C.white, 7.1, muralY, facadeZ - 0.01));
+    this.scene.add(this.box(muralW, muralH, 0.04, 0x3F6A75, 7.1, muralY, facadeZ + 0.01));
+
+    // ---- SIDE WALLS detail ----
+    // Small recessed windows on side walls (visible in back/side photos)
     const sideX = bW/2 + 0.02;
-    const sideZOffset = 2.0;
-    // Left side slots
-    this.scene.add(this.createRecessedWindow(0.4, 1.2, C.shutterBrown, -sideX, bY - 0.5, sideZOffset, 'X'));
-    this.scene.add(this.createRecessedWindow(0.4, 1.2, C.shutterBrown, -sideX, bY - 0.5, -sideZOffset, 'X'));
-    // Right side slots
-    this.scene.add(this.createRecessedWindow(0.4, 1.2, C.shutterBrown, sideX, bY - 0.5, sideZOffset, 'X'));
-    this.scene.add(this.createRecessedWindow(0.4, 1.2, C.shutterBrown, sideX, bY - 0.5, -sideZOffset, 'X'));
+    const sideWinY = topBase + bH/2;
+    [-2.5, 0, 2.5].forEach(sz => {
+      this.scene.add(this.recessedWin(0.5, 1.0, C.shutterBrown, -sideX, sideWinY, sz, 'X'));
+      this.scene.add(this.recessedWin(0.5, 1.0, C.shutterBrown,  sideX, sideWinY, sz, 'X'));
+    });
 
-
-    // 6. MAIN HIP ROOF (Mái ngói đỏ chóp xiên dạng khối thống nhất)
-    const rW = bW + 1.2;
-    const rD = bD + 1.2;
-    const rH = 2.4;
-    const rY = baseH + 0.1 + bH; // Base height of roof
+    // ---- MAIN HIP ROOF ----
+    const roofOverhang = 1.0;
+    const rW = bW + roofOverhang * 2;  // 22
+    const rD = bD + roofOverhang * 2;  // 11
+    const rH = 2.8;
+    const rY = topBase + bH;
 
     const roofGroup = new THREE.Group();
     roofGroup.position.set(0, rY, 0);
 
-    // Create the main solid hip roof block (no overlapping corners)
-    const solidRoof = this.createHipRoof(rW, rH, rD, C.roofRed, 0, 0, 0);
-    roofGroup.add(solidRoof);
+    // Main solid hip roof
+    roofGroup.add(this.hipRoof(rW, rH, rD, C.roofTerra, 0, 0, 0));
 
-    // White trim overhang base board
-    const trimBase = this.createBox(rW - 0.2, 0.2, rD - 0.2, C.whiteWall, 0, 0.05, 0);
-    roofGroup.add(trimBase);
+    // White fascia/trim board around the eaves
+    roofGroup.add(this.box(rW + 0.1, 0.2, rD + 0.1, C.white, 0, 0.05, 0));
 
-    // Vertical ridges/grooves running down the slopes (mái cổ chạy dọc xuống)
-    const ridgeHalf = (rW - rD) / 2;
-    const slopeLen = Math.sqrt(rH*rH + (rD/2)*(rD/2));
-    const angle = Math.atan2(rH, rD/2);
-    const ridgeSpacing = 0.28;
+    // Ridge cap along the top (the ridge line running along X)
+    const ridgeHalf = Math.max(0, (rW - rD) / 2);
+    roofGroup.add(this.box(ridgeHalf * 2 + 0.2, 0.12, 0.18, C.roofRidge, 0, rH - 0.02, 0));
 
-    // A. Front and Back ridges (run along Z-Y, spaced along X)
-    for (let rx = -ridgeHalf + 0.1; rx <= ridgeHalf - 0.1; rx += ridgeSpacing) {
-      // Front slope ridge
-      const ridgeF = this.createBox(0.04, 0.04, slopeLen, 0x853E2F, rx, rH/2 + 0.04, rD/4);
-      ridgeF.rotation.x = -angle;
-      roofGroup.add(ridgeF);
+    // Vertical ridge lines (song ngoi doc) on all 4 slopes
+    const ridgeSpacing = 0.3;
 
-      // Back slope ridge
-      const ridgeB = this.createBox(0.04, 0.04, slopeLen, 0x853E2F, rx, rH/2 + 0.04, -rD/4);
-      ridgeB.rotation.x = angle;
-      roofGroup.add(ridgeB);
+    // Front and Back slopes: ridges run from ridge down to eaves along Z
+    const slopeFB = Math.sqrt(rH * rH + (rD/2) * (rD/2));
+    const angleFB = Math.atan2(rH, rD / 2);
+
+    for (let rx = -ridgeHalf; rx <= ridgeHalf; rx += ridgeSpacing) {
+      // Front
+      const rF = this.box(0.04, 0.04, slopeFB, C.roofRidge, rx, rH/2 + 0.03, rD/4);
+      rF.rotation.x = -angleFB;
+      roofGroup.add(rF);
+      // Back
+      const rB = this.box(0.04, 0.04, slopeFB, C.roofRidge, rx, rH/2 + 0.03, -rD/4);
+      rB.rotation.x = angleFB;
+      roofGroup.add(rB);
     }
 
-    // B. Left and Right hip ridges (run along X-Y, spaced along Z)
-    for (let rz = -rD/2 + 0.1; rz <= rD/2 - 0.1; rz += ridgeSpacing) {
-      // Left slope ridge
-      const ridgeL = this.createBox(slopeLen, 0.04, 0.04, 0x853E2F, -rW/2 + rD/4, rH/2 + 0.04, rz);
-      ridgeL.rotation.z = angle;
-      roofGroup.add(ridgeL);
-
-      // Right slope ridge
-      const ridgeR = this.createBox(slopeLen, 0.04, 0.04, 0x853E2F, rW/2 - rD/4, rH/2 + 0.04, rz);
-      ridgeR.rotation.z = -angle;
-      roofGroup.add(ridgeR);
+    // Left and Right hip slopes: ridges run from ridge down to eaves along X
+    const slopeLR = Math.sqrt(rH * rH + (rD/2) * (rD/2));
+    // Left and right hips are triangular, use same angle
+    for (let rz = -rD/2 + 0.3; rz <= rD/2 - 0.3; rz += ridgeSpacing) {
+      // Left
+      const rL = this.box(slopeLR, 0.04, 0.04, C.roofRidge, -rW/2 + rD/4, rH/2 + 0.03, rz);
+      rL.rotation.z = angleFB;
+      roofGroup.add(rL);
+      // Right
+      const rR = this.box(slopeLR, 0.04, 0.04, C.roofRidge, rW/2 - rD/4, rH/2 + 0.03, rz);
+      rR.rotation.z = -angleFB;
+      roofGroup.add(rR);
     }
 
     this.scene.add(roofGroup);
 
+    // ---- CENTRAL WATCHTOWER ----
+    // Square tower rises from center of roof ridge
+    const tW = 3.2;
+    const tD = 3.2;
+    const tH = 5.5;
+    const tBase = rY + rH * 0.5; // starts partway up the roof
+    const tY = tBase + tH / 2;
 
-    // 7. CENTRAL WATCH TOWER & CLOCK (Tháp canh trung tâm)
-    // Sits right in the center of the roof ridge
-    const tW = 3.6;
-    const tD = 3.6;
-    const tH = 6.2;
-    const tY = rY + rH - 0.3 + tH / 2; // Rises above roof ridge
+    // Tower walls
+    this.scene.add(this.box(tW, tH, tD, C.cream, 0, tY, 0, { roughness: 0.68 }));
 
-    // Tower base walls
-    const tower = this.createBox(tW, tH, tD, C.whiteWall, 0, tY, 0, { roughness: 0.65 });
-    this.scene.add(tower);
+    // White trim band at top of tower
+    this.scene.add(this.box(tW + 0.2, 0.2, tD + 0.2, C.white, 0, tBase + tH, 0));
+    // White trim band at bottom of tower
+    this.scene.add(this.box(tW + 0.15, 0.15, tD + 0.15, C.white, 0, tBase + 0.08, 0));
 
-    // Circular clock face (Đồng hồ phía trước)
-    const clockR = 0.55;
-    const clockZ = tD/2 + 0.06;
-    const clockY = tY - tH/2 + 1.3;
-    const clock = this.createCylinder(clockR, clockR, 0.08, C.clockBlack, 0, clockY, clockZ, 24);
+    // Tower front face details (facing +Z)
+    const tFaceZ = tD/2 + 0.04;
+
+    // Clock face (circular, black)
+    const clockR = 0.5;
+    const clockY = tBase + 1.2;
+    const clock = this.cyl(clockR, clockR, 0.06, C.clockBlack, 0, clockY, tFaceZ, 24);
     clock.rotation.x = Math.PI / 2;
     this.scene.add(clock);
+    // Clock center pin
+    const pin = this.cyl(0.06, 0.06, 0.08, 0xDDDDDD, 0, clockY, tFaceZ + 0.02, 8);
+    pin.rotation.x = Math.PI / 2;
+    this.scene.add(pin);
+    // Clock hour markers (simple white dots at 12, 3, 6, 9)
+    [0, Math.PI/2, Math.PI, Math.PI*1.5].forEach(a => {
+      const mx = Math.sin(a) * (clockR - 0.1);
+      const my = Math.cos(a) * (clockR - 0.1);
+      const dot = this.cyl(0.03, 0.03, 0.07, 0xFFFFFF, mx, clockY + my, tFaceZ + 0.02, 6);
+      dot.rotation.x = Math.PI / 2;
+      this.scene.add(dot);
+    });
 
-    // Clock center detail (white dot/hands simulation)
-    const clockPin = this.createCylinder(0.08, 0.08, 0.1, 0xFFFFFF, 0, clockY, clockZ + 0.02, 8);
-    clockPin.rotation.x = Math.PI / 2;
-    this.scene.add(clockPin);
-
-    // 3 vertical louver slits above the clock
-    const louverW = 0.18;
-    const louverH = 0.9;
-    const louverY = clockY + 1.6;
-    const louverZ = tD/2 + 0.05;
+    // Vertical louver slits above clock (3 slits, as in photo)
+    const louverY = clockY + 1.5;
+    const louverH = 1.0;
     const louverSpacing = 0.35;
     for (let i = -1; i <= 1; i++) {
-      const lx = i * louverSpacing;
-      const slit = this.createBox(louverW, louverH, 0.06, C.shutterBrown, lx, louverY, louverZ);
-      this.scene.add(slit);
+      this.scene.add(this.box(0.15, louverH, 0.05, C.shutterBrown, i * louverSpacing, louverY, tFaceZ));
+    }
+    // Louver frame
+    this.scene.add(this.box(1.4, louverH + 0.15, 0.03, C.white, 0, louverY, tFaceZ - 0.02));
+
+    // Upper window on tower front (above louvers)
+    const twinY = louverY + 1.4;
+    this.scene.add(this.box(0.8, 0.7, 0.05, C.shutterBrown, 0, twinY, tFaceZ));
+    this.scene.add(this.box(0.9, 0.8, 0.03, C.white, 0, twinY, tFaceZ - 0.02));
+
+    // Tower side windows (left and right faces)
+    const tSideWinY = tBase + tH / 2 + 0.5;
+    this.scene.add(this.recessedWin(0.7, 1.5, C.shutterBrown, -tW/2 - 0.02, tSideWinY, 0, 'X'));
+    this.scene.add(this.recessedWin(0.7, 1.5, C.shutterBrown,  tW/2 + 0.02, tSideWinY, 0, 'X'));
+
+    // Tower back - simple, clean (as in back photo)
+    // No extra decoration needed, the cream box is already there
+
+    // ---- TOWER SMALL HIP ROOF ----
+    // Small hip roof on top of tower (visible in all photos - terracotta colored)
+    const trW = tW + 0.6;
+    const trD = tD + 0.6;
+    const trH = 1.2;
+    const trY = tBase + tH;
+
+    const towerRoofGroup = new THREE.Group();
+    towerRoofGroup.position.set(0, trY, 0);
+
+    towerRoofGroup.add(this.hipRoof(trW, trH, trD, C.roofTerra, 0, 0, 0));
+
+    // White collar/trim under tower roof
+    towerRoofGroup.add(this.box(trW + 0.05, 0.12, trD + 0.05, C.white, 0, 0.03, 0));
+
+    // Ridge lines on tower roof (smaller, fewer)
+    const trSlopeLen = Math.sqrt(trH * trH + (trD/2) * (trD/2));
+    const trAngle = Math.atan2(trH, trD/2);
+    const trRidgeHalf = Math.max(0, (trW - trD) / 2);
+
+    for (let rx = -trRidgeHalf; rx <= trRidgeHalf; rx += 0.25) {
+      const rf = this.box(0.03, 0.03, trSlopeLen, C.roofRidge, rx, trH/2 + 0.02, trD/4);
+      rf.rotation.x = -trAngle;
+      towerRoofGroup.add(rf);
+      const rb = this.box(0.03, 0.03, trSlopeLen, C.roofRidge, rx, trH/2 + 0.02, -trD/4);
+      rb.rotation.x = trAngle;
+      towerRoofGroup.add(rb);
     }
 
-    // Additional double window above tower louvers
-    const tWin2Y = louverY + 1.35;
-    const tWin2W = 0.9;
-    const tWin2H = 0.8;
-    const tWin2 = this.createBox(tWin2W, tWin2H, 0.06, C.shutterBrown, 0, tWin2Y, tD/2 + 0.05);
-    this.scene.add(tWin2);
-    // White inner panes
-    const tWin2Inner = this.createBox(tWin2W - 0.15, tWin2H - 0.15, 0.08, C.spireGrey, 0, tWin2Y, tD/2 + 0.04);
-    this.scene.add(tWin2Inner);
+    this.scene.add(towerRoofGroup);
 
-    // Side windows on the tower (Left and Right faces - recessed)
-    const tWinY = tY + 0.8;
-    const tWinW = 0.8;
-    const tWinH = 1.8;
-    this.scene.add(this.createRecessedWindow(tWinW, tWinH, C.shutterBrown, -tW/2 - 0.02, tWinY, 0, 'X'));
-    this.scene.add(this.createRecessedWindow(tWinW, tWinH, C.shutterBrown, tW/2 + 0.02, tWinY, 0, 'X'));
+    // ---- SPIRE (Chop nhon) ----
+    // Pointed pyramid spire on top of tower roof (cream/beige colored)
+    const spireBase = trY + trH;
+    const spireH = 3.5;
 
+    // Collar/trim between tower roof and spire
+    this.scene.add(this.box(tW * 0.55, 0.25, tD * 0.55, C.white, 0, spireBase + 0.12, 0));
 
-    // 8. TOWER SPIRE / ROOF (Chóp nhọn tháp canh)
-    // Pyramid spire roof, grey/white with dark brown trim edges
-    const sH = 4.2; // Height of the pyramid spire (taller and sharper)
-    const sY = tY + tH/2; // Base of the spire
-    const spireGroup = new THREE.Group();
-    spireGroup.position.set(0, sY, 0);
+    // Pyramidal spire
+    this.scene.add(this.pyramid(tW * 0.5, spireH, C.spire, 0, spireBase + 0.25, 0));
 
-    // White trim collar below spire
-    const spireCollar = this.createBox(tW + 0.4, 0.35, tD + 0.4, C.whiteWall, 0, 0.15, 0);
-    spireGroup.add(spireCollar);
-
-    // Pyramidal structure
-    const pyrGeo = new THREE.ConeGeometry((tW + 0.2) * 0.707, sH, 4);
-    const pyr = new THREE.Mesh(pyrGeo, this.mat(C.spireGrey, { roughness: 0.8 }));
-    pyr.position.y = 0.35 + sH / 2;
-    pyr.rotation.y = Math.PI / 4; // Align 4 corners of cone to square faces
-    pyr.castShadow = true;
-    pyr.receiveShadow = true;
-    spireGroup.add(pyr);
-
-    // Trim lines on the 4 corners of the spire (like Photo 3)
-    const trimW = 0.08;
-    const trimL = Math.sqrt(Math.pow(tW/2, 2) + Math.pow(sH, 2)) + 0.2;
-    const angle = Math.atan2(tW/2, sH);
+    // Trim edges on spire corners (4 lines)
+    const spireCornerDist = tW * 0.25 * 0.5;
+    const spireEdgeLen = Math.sqrt(spireH * spireH + spireCornerDist * spireCornerDist * 2) + 0.2;
+    const spireEdgeAngle = Math.atan2(spireCornerDist, spireH);
 
     for (let i = 0; i < 4; i++) {
-      const angleRad = (i * Math.PI) / 2 + Math.PI / 4;
-      const tx = Math.cos(angleRad) * (tW / 4);
-      const tz = Math.sin(angleRad) * (tW / 4);
-
-      const trim = new THREE.Mesh(
-        new THREE.BoxGeometry(trimW, trimL, trimW),
+      const a = (i * Math.PI) / 2 + Math.PI / 4;
+      const ex = Math.cos(a) * spireCornerDist * 0.5;
+      const ez = Math.sin(a) * spireCornerDist * 0.5;
+      const edge = new THREE.Mesh(
+        new THREE.BoxGeometry(0.06, spireEdgeLen, 0.06),
         this.mat(C.spireTrim, { roughness: 0.5 })
       );
-      trim.position.set(tx, 0.35 + sH / 2, tz);
-      trim.rotation.y = -angleRad;
-      // Slanted rotation matching the slope
-      if (i === 0) trim.rotation.z = angle;
-      if (i === 1) trim.rotation.x = -angle;
-      if (i === 2) trim.rotation.z = -angle;
-      if (i === 3) trim.rotation.x = angle;
-
-      spireGroup.add(trim);
+      edge.position.set(ex, spireBase + 0.25 + spireH/2, ez);
+      edge.rotation.y = -a;
+      if (i === 0) edge.rotation.z = spireEdgeAngle;
+      if (i === 1) edge.rotation.x = -spireEdgeAngle;
+      if (i === 2) edge.rotation.z = -spireEdgeAngle;
+      if (i === 3) edge.rotation.x = spireEdgeAngle;
+      edge.castShadow = true;
+      this.scene.add(edge);
     }
 
-    // Top metal spire point
-    const point = this.createCylinder(0.02, 0.05, 0.7, 0x909090, 0, 0.35 + sH + 0.35, 0, 8);
-    spireGroup.add(point);
-
-    this.scene.add(spireGroup);
+    // Metal tip at very top
+    this.scene.add(this.cyl(0.02, 0.04, 0.6, 0x888888, 0, spireBase + 0.25 + spireH + 0.3, 0, 6));
   },
 
   // ============ HOTSPOTS ============
   createHotspots() {
     if (typeof MAP_DATA === 'undefined' || !MAP_DATA.areas || MAP_DATA.areas.length === 0) return;
 
-    // Hotspots will anchor to specific components on the 3D palace
     const hotspotPositions = {
-      'mat-tien-tru-cot':   { x: 0, y: 3.5, z: 6.2 },
-      'thap-canh-dong-ho':  { x: 0, y: 11.5, z: 2.2 },
-      'tranh-tuong-canh':   { x: 7.0, y: 3.5, z: 4.2 },
-      'mai-ngoi-do':        { x: -7.0, y: 7.2, z: 0 },
-      'be-da-tham-co':      { x: 12.0, y: 0.8, z: 5.0 },
+      'mat-tien-tru-cot':   { x: 0, y: 3.5, z: 7 },
+      'thap-canh-dong-ho':  { x: 0, y: 12, z: 2 },
+      'tranh-tuong-canh':   { x: 7, y: 4, z: 5 },
+      'mai-ngoi-do':        { x: -6, y: 8, z: 0 },
+      'be-da-tham-co':      { x: 10, y: 0.8, z: 5 },
     };
 
-    // Clean old hotspots
     this.hotspots.forEach(h => {
       this.scene.remove(h.marker);
       this.scene.remove(h.pin);
@@ -582,22 +574,17 @@ const Temple3D = {
     });
     this.hotspots = [];
 
-    // Create 3D marker meshes
     MAP_DATA.areas.forEach((area, idx) => {
       const pos = hotspotPositions[area.id];
       if (!pos) return;
 
-      // Marker sphere (invisible, for raycasting)
       const markerGeo = new THREE.SphereGeometry(0.8, 12, 12);
-      const markerMat = new THREE.MeshBasicMaterial({ 
-        transparent: true, opacity: 0, depthTest: false 
-      });
+      const markerMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthTest: false });
       const marker = new THREE.Mesh(markerGeo, markerMat);
       marker.position.set(pos.x, pos.y, pos.z);
       marker.userData = { areaId: area.id, areaIndex: idx, isHotspot: true };
       this.scene.add(marker);
 
-      // Visible pin
       const pinGeo = new THREE.SphereGeometry(0.4, 16, 16);
       const pinMat = new THREE.MeshStandardMaterial({
         color: area.color || 0xC9A84C,
@@ -610,7 +597,6 @@ const Temple3D = {
       pin.position.set(pos.x, pos.y, pos.z);
       this.scene.add(pin);
 
-      // Outer ring (pulsing glow)
       const ringGeo = new THREE.RingGeometry(0.45, 0.65, 24);
       const ringMat = new THREE.MeshBasicMaterial({
         color: area.color || 0xC9A84C,
@@ -623,24 +609,23 @@ const Temple3D = {
       ring.lookAt(this.camera.position);
       this.scene.add(ring);
 
-      this.hotspots.push({ 
-        marker, pin, ring, area, idx, 
-        pos: new THREE.Vector3(pos.x, pos.y, pos.z) 
+      this.hotspots.push({
+        marker, pin, ring, area, idx,
+        pos: new THREE.Vector3(pos.x, pos.y, pos.z)
       });
     });
   },
 
-  // ============ INTERACTION & EVENT HANDLERS ============
+  // ============ EVENTS ============
   onClick(event) {
     const rect = this.renderer.domElement.getBoundingClientRect();
     this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    
     const hotspotMeshes = this.hotspots.map(h => h.marker);
     const intersects = this.raycaster.intersectObjects(hotspotMeshes);
-    
+
     if (intersects.length > 0) {
       const hit = intersects[0].object;
       const area = MAP_DATA.areas[hit.userData.areaIndex];
@@ -658,7 +643,6 @@ const Temple3D = {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const hotspotMeshes = this.hotspots.map(h => h.marker);
     const intersects = this.raycaster.intersectObjects(hotspotMeshes);
-    
     this.renderer.domElement.style.cursor = intersects.length > 0 ? 'pointer' : 'grab';
   },
 
@@ -674,19 +658,16 @@ const Temple3D = {
   // ============ RENDER LOOP ============
   animate() {
     this.animationId = requestAnimationFrame(() => this.animate());
-    
+
     const time = Date.now() * 0.001;
 
-    // Controls update
     if (this.controls) this.controls.update();
 
-    // Pulse & Float hotspots
     this.hotspots.forEach((h, i) => {
       h.ring.lookAt(this.camera.position);
       const scale = 1 + 0.25 * Math.sin(time * 2.2 + i * 0.7);
       h.ring.scale.set(scale, scale, scale);
       h.ring.material.opacity = 0.2 + 0.2 * Math.sin(time * 2.2 + i * 0.7);
-      
       h.pin.position.y = h.pos.y + 0.12 * Math.sin(time * 1.6 + i * 0.4);
     });
 
@@ -696,11 +677,9 @@ const Temple3D = {
   }
 };
 
-// Global entrypoint for application
 document.addEventListener('DOMContentLoaded', () => {
   Temple3D.init('temple-3d-container');
-  
-  // Listen to hotspot additions later
+
   document.addEventListener('hotspots-updated', () => {
     Temple3D.createHotspots();
   });
