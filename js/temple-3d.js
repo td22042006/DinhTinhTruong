@@ -176,9 +176,9 @@ const Temple3D = {
               tempV.fromBufferAttribute(position, i);
               child.localToWorld(tempV);
 
-              // If vertex is below roof gutter (Y < 6.5) and protrudes at the back (Z < -3.6)
-              if (tempV.y < 6.5 && tempV.z < -3.6) {
-                tempV.z = -3.6; // Flatten to the Z = -3.6 plane
+              // If vertex is below roof overhang (Y < 5.88) and protrudes at the back (Z < -3.05)
+              if (tempV.y < 5.88 && tempV.z < -3.05) {
+                tempV.z = -3.05; // Flatten to the original back wall plane
                 child.worldToLocal(tempV);
                 position.setXYZ(i, tempV.x, tempV.y, tempV.z);
               }
@@ -187,24 +187,6 @@ const Temple3D = {
             geometry.computeVertexNormals();
           }
         });
-
-        // Add a plaster wall (0.6 units thick) to close the back cavity and side gaps perfectly
-        const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.94; // fits perfectly to side walls
-        const wallH = 6.4; // height to reach and touch the underside of the roof eave (up to Y=6.5)
-        const wallD = 0.6; // thickness to fill the side gap between original corner (-3.0) and roof eave (-3.6)
-        const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
-        const coverWallMat = new THREE.MeshStandardMaterial({
-          color: 0xE7D5BC, // Bright warm cream matching front facade color
-          roughness: 0.9,
-          metalness: 0.05
-        });
-        const coverWall = new THREE.Mesh(coverWallGeo, coverWallMat);
-        // Positioned at Z = -3.3 so the back face aligns perfectly at -3.6 under the roof gutter,
-        // and the front face starts at -3.0 overlapping the side walls to close all side gaps.
-        coverWall.position.set(0, wallH / 2 + 0.1, -3.3);
-        coverWall.castShadow = true;
-        coverWall.receiveShadow = true;
-        this.scene.add(coverWall);
 
         // Update controls target to model center
         this.controls.target.set(0, scaledBox.getSize(new THREE.Vector3()).y / 2, 0);
