@@ -176,9 +176,9 @@ const Temple3D = {
               tempV.fromBufferAttribute(position, i);
               child.localToWorld(tempV);
 
-              // If vertex is below roof gutter (Y < 5.88) and protrudes at the back (Z < -3.05)
-              if (tempV.y < 5.88 && tempV.z < -3.05) {
-                tempV.z = -3.05; // Flatten to the wall plane
+              // If vertex is below roof gutter (Y < 6.5) and protrudes at the back (Z < -2.5)
+              if (tempV.y < 6.5 && tempV.z < -2.5) {
+                tempV.z = -2.5; // Flatten to the Z = -2.5 plane
                 child.worldToLocal(tempV);
                 position.setXYZ(i, tempV.x, tempV.y, tempV.z);
               }
@@ -188,10 +188,10 @@ const Temple3D = {
           }
         });
 
-        // Add a solid plaster wall (1.5 units thick) inserted inwards into the building to fill the space
+        // Add a super thin plaster wall (0.05 units thick) over the flattened back to hide old textures
         const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.94; // fits perfectly to side walls
-        const wallH = 5.78; // adjusted height to fit exactly under the roof eave (up to Y=5.88)
-        const wallD = 1.5; // thick wall inserted inwards to look completely solid
+        const wallH = 6.4; // height to reach and touch the underside of the roof eave (up to Y=6.5)
+        const wallD = 0.05; // thin flat wall
         const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
         const coverWallMat = new THREE.MeshStandardMaterial({
           color: 0xE7D5BC, // Bright warm cream matching front facade color
@@ -199,9 +199,8 @@ const Temple3D = {
           metalness: 0.05
         });
         const coverWall = new THREE.Mesh(coverWallGeo, coverWallMat);
-        // Positioned at Z = -2.32 so the back face aligns perfectly at -3.07, plugging the back cavity
-        // Y position set to wallH / 2 + 0.1 = 2.99 so the top of the wall reaches exactly Y = 5.88
-        coverWall.position.set(0, 2.99, -2.32);
+        // Positioned at Z = -2.53 (just behind the flattened Z = -2.5 plane)
+        coverWall.position.set(0, wallH / 2 + 0.1, -2.53);
         coverWall.castShadow = true;
         coverWall.receiveShadow = true;
         this.scene.add(coverWall);
