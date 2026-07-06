@@ -163,18 +163,18 @@ const Temple3D = {
         this.scene.add(this.model);
 
         // Add a clean cream cover wall on the back (-Z) to hide mirrored front details (photo 2)
-        const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.93; // wider to cover fully
-        const wallH = scaledBox.getSize(new THREE.Vector3()).y * 0.46; // lower height to avoid clipping roof tiles
-        const wallD = 2.2; // much thicker to fully absorb the canopy and windows
+        const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.90; // slightly narrower to prevent side clipping
+        const wallH = scaledBox.getSize(new THREE.Vector3()).y * 0.40; // lower height to stay below the roof line
+        const wallD = 3.8; // extremely thick to swallow the entire protruding portico canopy
         const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
         const coverWallMat = new THREE.MeshStandardMaterial({
-          color: 0xE6D6B3, // Colonial cream color matching the model texture
+          color: 0xD5C0B4, // Rosy-peach cream matching the GLB model's wall color
           roughness: 0.9,
           metalness: 0.05
         });
         const coverWall = new THREE.Mesh(coverWallGeo, coverWallMat);
-        // Positioned lower and shifted outward in Z to cover the canopy safely
-        coverWall.position.set(0, wallH / 2 + 0.4, -scaledBox.getSize(new THREE.Vector3()).z * 0.37);
+        // Positioned lower (Y) and shifted slightly inward (Z) to merge with the building core
+        coverWall.position.set(0, wallH / 2 + 0.3, -scaledBox.getSize(new THREE.Vector3()).z * 0.33);
         coverWall.castShadow = true;
         coverWall.receiveShadow = true;
         this.scene.add(coverWall);
