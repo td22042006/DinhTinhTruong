@@ -16,16 +16,16 @@ const Temple3D = {
 
   // Colors designed to match the provided photos
   COLORS: {
-    whiteWall:     0xF9F6EF, // Cream white
-    roofRed:       0xC13F2E, // Terracotta red
-    columnTerracotta: 0x9B4E3C, // Terracotta pillars
+    whiteWall:     0xEAD6B1, // Colonial pale yellow/cream matching the photo
+    roofRed:       0x9A5A44, // Brownish-terracotta red matching top-right photo
+    columnTerracotta: 0x903C2C, // Deep red-brown pillars/pilasters
     shutterBrown:  0x5A3C28, // Dark brown wood
     signBlue:      0x1E3B5C, // Dark blue sign board
     textGold:      0xDCB35C, // Gold text color
     groundStone:   0xBAB0A2, // Grey stone base
     grassGreen:    0x4E723D, // Grass lawn
-    spireGrey:     0xE2DFD8, // Light grey spire
-    spireTrim:     0x6E4C38, // Trim brown for spire edges
+    spireGrey:     0xEBDDBE, // Light cream/beige spire faces
+    spireTrim:     0x8B3E2F, // Trim red-brown for spire edges
     clockBlack:    0x252528, // Black clock face
     windowGlass:   0x222225, // Glass color
     skyColor:      0xE8F2F7,
@@ -223,15 +223,16 @@ const Temple3D = {
     const canopy = this.createBox(pW + 0.4, canopyH, pD + 0.4, C.whiteWall, 0, baseH + 0.1 + pH + canopyH/2, pZ);
     this.scene.add(canopy);
 
-    // 4 terracotta-colored pillars (4 cột trụ tròn lớn)
-    const colR = 0.16;
+    // 8 terracotta-colored pillars (Hệ thống 8 cột trụ tròn sảnh trước)
+    const colR = 0.15;
     const colH = pH - 0.1;
     const colY = baseH + 0.1 + colH/2;
     const colZ = pZ + pD/2 - 0.2;
-    const colXSpacing = pW / 3.2; // Spacing for 4 columns
+    const colCount = 8;
+    const colXSpacing = pW / (colCount - 1); // Spacing for 8 columns
 
-    for (let i = -1.5; i <= 1.5; i += 1) {
-      const cx = i * colXSpacing;
+    for (let i = 0; i < colCount; i++) {
+      const cx = -pW/2 + i * colXSpacing;
       // Circular column shaft
       const col = this.createCylinder(colR, colR * 1.1, colH, C.columnTerracotta, cx, colY, colZ, 12);
       this.scene.add(col);
@@ -291,6 +292,18 @@ const Temple3D = {
     const rightFrame = this.createBox(muralW + 0.3, muralH + 0.3, 0.03, C.whiteWall, wingX, muralY, muralZ - 0.02);
     this.scene.add(rightFrame);
 
+    // Wing pilasters (Dải cột bổ tường trang trí hai bên sườn cánh)
+    const pilW = 0.25;
+    const pilH = bH;
+    const pilD = 0.15;
+    const pilZ = bD/2 + pilD/2;
+    const pilY = baseH + 0.1 + pilH/2;
+
+    [-wingX - 1.8, -wingX + 1.8, wingX - 1.8, wingX + 1.8].forEach(px => {
+      const pilaster = this.createBox(pilW, pilH, pilD, C.columnTerracotta, px, pilY, pilZ);
+      this.scene.add(pilaster);
+    });
+
     // Facade windows with dark wood shutters (Cửa sổ lá sách)
     // 2 windows on ground floor (below murals)
     const winGW = 0.9;
@@ -298,6 +311,11 @@ const Temple3D = {
     const winGY = baseH + 0.1 + winGH/2 + 0.3;
     this.scene.add(this.createBox(winGW, winGH, 0.05, C.shutterBrown, -wingX, winGY, muralZ));
     this.scene.add(this.createBox(winGW, winGH, 0.05, C.shutterBrown, wingX, winGY, muralZ));
+
+    // 2 windows on upper floor (above murals)
+    const winUY_wing = bY + bH/2 - 1.2;
+    this.scene.add(this.createBox(winGW, winGH, 0.05, C.shutterBrown, -wingX, winUY_wing, muralZ));
+    this.scene.add(this.createBox(winGW, winGH, 0.05, C.shutterBrown, wingX, winUY_wing, muralZ));
 
     // 2 windows on upper floor (next to central tower)
     const winUY = bY + bH/2 - 1.2;
@@ -405,6 +423,16 @@ const Temple3D = {
       this.scene.add(slit);
     }
 
+    // Additional double window above tower louvers
+    const tWin2Y = louverY + 1.35;
+    const tWin2W = 0.9;
+    const tWin2H = 0.8;
+    const tWin2 = this.createBox(tWin2W, tWin2H, 0.06, C.shutterBrown, 0, tWin2Y, tD/2 + 0.05);
+    this.scene.add(tWin2);
+    // White inner panes
+    const tWin2Inner = this.createBox(tWin2W - 0.15, tWin2H - 0.15, 0.08, C.spireGrey, 0, tWin2Y, tD/2 + 0.04);
+    this.scene.add(tWin2Inner);
+
     // Side windows on the tower (Left and Right faces)
     const tWinY = tY + 0.8;
     const tWinW = 0.8;
@@ -419,7 +447,7 @@ const Temple3D = {
 
     // 8. TOWER SPIRE / ROOF (Chóp nhọn tháp canh)
     // Pyramid spire roof, grey/white with dark brown trim edges
-    const sH = 3.6; // Height of the pyramid spire
+    const sH = 4.2; // Height of the pyramid spire (taller and sharper)
     const sY = tY + tH/2; // Base of the spire
     const spireGroup = new THREE.Group();
     spireGroup.position.set(0, sY, 0);
