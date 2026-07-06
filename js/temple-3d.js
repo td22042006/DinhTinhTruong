@@ -189,6 +189,51 @@ const Temple3D = {
     return group;
   },
 
+  // Helper to create a single-mesh unified hip roof (mái bánh ú) to avoid overlapping corners
+  createHipRoof(w, h, d, color, x, y, z) {
+    const ridgeHalf = Math.max(0.1, (w - d) / 2);
+
+    const vertices = new Float32Array([
+      // Front Face (facing +Z)
+      -w/2, 0, d/2,
+      w/2, 0, d/2,
+      ridgeHalf, h, 0,
+
+      -w/2, 0, d/2,
+      ridgeHalf, h, 0,
+      -ridgeHalf, h, 0,
+
+      // Back Face (facing -Z)
+      w/2, 0, -d/2,
+      -w/2, 0, -d/2,
+      -ridgeHalf, h, 0,
+
+      w/2, 0, -d/2,
+      -ridgeHalf, h, 0,
+      ridgeHalf, h, 0,
+
+      // Left Face (facing -X)
+      -w/2, 0, -d/2,
+      -w/2, 0, d/2,
+      -ridgeHalf, h, 0,
+
+      // Right Face (facing +X)
+      w/2, 0, d/2,
+      w/2, 0, -d/2,
+      ridgeHalf, h, 0,
+    ]);
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    geo.computeVertexNormals();
+
+    const mesh = new THREE.Mesh(geo, this.mat(color, { roughness: 0.75 }));
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    return mesh;
+  },
+
   // ============ PROCEDURAL PALACE GENERATOR ============
   buildPalace() {
     const C = this.COLORS;
@@ -358,9 +403,7 @@ const Temple3D = {
     this.scene.add(this.createRecessedWindow(0.4, 1.2, C.shutterBrown, sideX, bY - 0.5, -sideZOffset, 'X'));
 
 
-    // 6. MAIN HIP ROOF (Mái ngói đỏ chóp xiên)
-    // Terracotta-red hip roof slanted on all sides
-    // Constructed via an extrusion or sloped segments to look exact
+    // 6. MAIN HIP ROOF (Mái ngói đỏ chóp xiên dạng khối thống nhất)
     const rW = bW + 1.2;
     const rD = bD + 1.2;
     const rH = 2.4;
@@ -369,82 +412,44 @@ const Temple3D = {
     const roofGroup = new THREE.Group();
     roofGroup.position.set(0, rY, 0);
 
-    // Left main slope
-    const leftSlopeGeo = new THREE.BoxGeometry(rW / 2 + 0.2, 0.15, rD);
-    const leftSlope = new THREE.Mesh(leftSlopeGeo, this.mat(C.roofRed, { roughness: 0.75 }));
-    leftSlope.position.set(-rW / 4, rH / 2, 0);
-    leftSlope.rotation.z = Math.atan2(rH, rW / 2);
-    leftSlope.castShadow = true;
-    leftSlope.receiveShadow = true;
-    roofGroup.add(leftSlope);
-
-    // Right main slope
-    const rightSlope = new THREE.Mesh(leftSlopeGeo, this.mat(C.roofRed, { roughness: 0.75 }));
-    rightSlope.position.set(rW / 4, rH / 2, 0);
-    rightSlope.rotation.z = -Math.atan2(rH, rW / 2);
-    rightSlope.castShadow = true;
-    rightSlope.receiveShadow = true;
-    roofGroup.add(rightSlope);
-
-    // Front/Back triangular slopes (hip closures)
-    const hipSlopeGeo = new THREE.BoxGeometry(rW, 0.15, rD / 2 + 0.2);
-    // Front slope
-    const frontSlope = new THREE.Mesh(hipSlopeGeo, this.mat(C.roofRed, { roughness: 0.75 }));
-    frontSlope.position.set(0, rH / 2, rD / 4);
-    frontSlope.rotation.x = -Math.atan2(rH, rD / 2);
-    frontSlope.castShadow = true;
-    frontSlope.receiveShadow = true;
-    roofGroup.add(frontSlope);
-
-    // Back slope
-    const backSlope = new THREE.Mesh(hipSlopeGeo, this.mat(C.roofRed, { roughness: 0.75 }));
-    backSlope.position.set(0, rH / 2, -rD / 4);
-    backSlope.rotation.x = Math.atan2(rH, rD / 2);
-    backSlope.castShadow = true;
-    backSlope.receiveShadow = true;
-    roofGroup.add(backSlope);
+    // Create the main solid hip roof block (no overlapping corners)
+    const solidRoof = this.createHipRoof(rW, rH, rD, C.roofRed, 0, 0, 0);
+    roofGroup.add(solidRoof);
 
     // White trim overhang base board
     const trimBase = this.createBox(rW - 0.2, 0.2, rD - 0.2, C.whiteWall, 0, 0.05, 0);
     roofGroup.add(trimBase);
 
-    // Add vertical ridges/grooves on the left & right slopes (mái dốc dọc xuống)
-    const slopeLenLR = Math.sqrt(Math.pow(rW/2, 2) + Math.pow(rH, 2));
-    const ridgeSpacing = 0.26;
-    const ridgeCountLR = Math.floor(rD / ridgeSpacing);
-    const angleLR = Math.atan2(rH, rW / 2);
-    
-    for (let i = 0; i <= ridgeCountLR; i++) {
-      const rz = -rD/2 + i * ridgeSpacing;
-      
-      // Left ridges
-      const ridgeL = this.createBox(slopeLenLR - 0.1, 0.04, 0.04, 0x853E2F, -rW/4, rH/2 + 0.08, rz);
-      ridgeL.rotation.z = angleLR;
-      roofGroup.add(ridgeL);
+    // Vertical ridges/grooves running down the slopes (mái cổ chạy dọc xuống)
+    const ridgeHalf = (rW - rD) / 2;
+    const slopeLen = Math.sqrt(rH*rH + (rD/2)*(rD/2));
+    const angle = Math.atan2(rH, rD/2);
+    const ridgeSpacing = 0.28;
 
-      // Right ridges
-      const ridgeR = this.createBox(slopeLenLR - 0.1, 0.04, 0.04, 0x853E2F, rW/4, rH/2 + 0.08, rz);
-      ridgeR.rotation.z = -angleLR;
-      roofGroup.add(ridgeR);
-    }
-
-    // Add vertical ridges/grooves on front & back slopes
-    const slopeLenFB = Math.sqrt(Math.pow(rD/2, 2) + Math.pow(rH, 2));
-    const ridgeCountFB = Math.floor(rW / ridgeSpacing);
-    const angleFB = Math.atan2(rH, rD / 2);
-
-    for (let i = 0; i <= ridgeCountFB; i++) {
-      const rx = -rW/2 + i * ridgeSpacing;
-
-      // Front ridges
-      const ridgeF = this.createBox(0.04, 0.04, slopeLenFB - 0.1, 0x853E2F, rx, rH/2 + 0.08, rD/4);
-      ridgeF.rotation.x = -angleFB;
+    // A. Front and Back ridges (run along Z-Y, spaced along X)
+    for (let rx = -ridgeHalf + 0.1; rx <= ridgeHalf - 0.1; rx += ridgeSpacing) {
+      // Front slope ridge
+      const ridgeF = this.createBox(0.04, 0.04, slopeLen, 0x853E2F, rx, rH/2 + 0.04, rD/4);
+      ridgeF.rotation.x = -angle;
       roofGroup.add(ridgeF);
 
-      // Back ridges
-      const ridgeB = this.createBox(0.04, 0.04, slopeLenFB - 0.1, 0x853E2F, rx, rH/2 + 0.08, -rD/4);
-      ridgeB.rotation.x = angleFB;
+      // Back slope ridge
+      const ridgeB = this.createBox(0.04, 0.04, slopeLen, 0x853E2F, rx, rH/2 + 0.04, -rD/4);
+      ridgeB.rotation.x = angle;
       roofGroup.add(ridgeB);
+    }
+
+    // B. Left and Right hip ridges (run along X-Y, spaced along Z)
+    for (let rz = -rD/2 + 0.1; rz <= rD/2 - 0.1; rz += ridgeSpacing) {
+      // Left slope ridge
+      const ridgeL = this.createBox(slopeLen, 0.04, 0.04, 0x853E2F, -rW/2 + rD/4, rH/2 + 0.04, rz);
+      ridgeL.rotation.z = angle;
+      roofGroup.add(ridgeL);
+
+      // Right slope ridge
+      const ridgeR = this.createBox(slopeLen, 0.04, 0.04, 0x853E2F, rW/2 - rD/4, rH/2 + 0.04, rz);
+      ridgeR.rotation.z = -angle;
+      roofGroup.add(ridgeR);
     }
 
     this.scene.add(roofGroup);
