@@ -176,8 +176,8 @@ const Temple3D = {
               tempV.fromBufferAttribute(position, i);
               child.localToWorld(tempV);
 
-              // If vertex is below roof gutter (Y < 6.5) and protrudes at the back (Z < -5.0)
-              if (tempV.y < 6.5 && tempV.z < -5.0) {
+              // If vertex is below roof gutter (Y < 6.7) and protrudes at the back (Z < -5.0)
+              if (tempV.y < 6.7 && tempV.z < -5.0) {
                 tempV.z = -5.0; // Flatten to the Z = -5.0 plane
                 child.worldToLocal(tempV);
                 position.setXYZ(i, tempV.x, tempV.y, tempV.z);
@@ -188,9 +188,10 @@ const Temple3D = {
           }
         });
 
-        // Add a super thin plaster wall (0.05 units thick) over the flattened back to hide old textures
+        // Add a super thin plaster wall (0.05 units thick) over the flattened back
+        // Wall starts from top of planter (Y=0.55) up to Y=6.7
         const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.94; // fits perfectly to side walls
-        const wallH = 6.4; // height to reach and touch the underside of the roof eave (up to Y=6.5)
+        const wallH = 6.15; // height from planter top (Y=0.55) to Y=6.7
         const wallD = 0.05; // thin flat wall
         const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
         const coverWallMat = new THREE.MeshStandardMaterial({
@@ -199,8 +200,8 @@ const Temple3D = {
           metalness: 0.05
         });
         const coverWall = new THREE.Mesh(coverWallGeo, coverWallMat);
-        // Positioned at Z = -5.03 (just behind the flattened Z = -5.0 plane)
-        coverWall.position.set(0, wallH / 2 + 0.1, -5.03);
+        // Positioned at Z = -5.03, centered vertically from Y=0.55 to Y=6.7
+        coverWall.position.set(0, 0.55 + wallH / 2, -5.03);
         coverWall.castShadow = true;
         coverWall.receiveShadow = true;
         this.scene.add(coverWall);
