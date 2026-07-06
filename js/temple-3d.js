@@ -188,10 +188,10 @@ const Temple3D = {
           }
         });
 
-        // Add a super thin plaster wall (0.05 units thick) over the flattened back to hide old textures
+        // Add a solid plaster wall (1.5 units thick) inserted inwards into the building to fill the space
         const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.94; // fits perfectly to side walls
         const wallH = 6.4; // raised height to reach and touch the underside of the roof eave (up to Y=6.5)
-        const wallD = 0.05; // extremely thin to look completely flat and flush (no box backpack)
+        const wallD = 1.5; // thick wall inserted inwards to look completely solid
         const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
         const coverWallMat = new THREE.MeshStandardMaterial({
           color: 0xE7D5BC, // Bright warm cream matching front facade color
@@ -199,7 +199,8 @@ const Temple3D = {
           metalness: 0.05
         });
         const coverWall = new THREE.Mesh(coverWallGeo, coverWallMat);
-        coverWall.position.set(0, wallH / 2 + 0.1, -3.08); // Placed exactly on the flattened plane
+        // Positioned at Z = -2.32 so the back face aligns perfectly at -3.07, plugging the back cavity
+        coverWall.position.set(0, wallH / 2 + 0.1, -2.32);
         coverWall.castShadow = true;
         coverWall.receiveShadow = true;
         this.scene.add(coverWall);
