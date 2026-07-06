@@ -162,6 +162,32 @@ const Temple3D = {
 
         this.scene.add(this.model);
 
+        // Force update matrices to get accurate world coordinates
+        this.model.updateMatrixWorld(true);
+
+        // Flatten the back duplicate canopy, pillars, and details dynamically in world coordinates
+        this.model.traverse((child) => {
+          if (child.isMesh) {
+            const geometry = child.geometry;
+            const position = geometry.attributes.position;
+            const tempV = new THREE.Vector3();
+
+            for (let i = 0; i < position.count; i++) {
+              tempV.fromBufferAttribute(position, i);
+              child.localToWorld(tempV);
+
+              // If vertex is below roof gutter height (Y < 6.5) and protrudes at the back (Z < -3.05)
+              if (tempV.y < 6.5 && tempV.z < -3.05) {
+                tempV.z = -3.05; // Flatten to the original back wall plane
+                child.worldToLocal(tempV);
+                position.setXYZ(i, tempV.x, tempV.y, tempV.z);
+              }
+            }
+            position.needsUpdate = true;
+            geometry.computeVertexNormals();
+          }
+        });
+
         // Update controls target to model center
         this.controls.target.set(0, scaledBox.getSize(new THREE.Vector3()).y / 2, 0);
         this.controls.update();
