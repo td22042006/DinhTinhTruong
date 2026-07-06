@@ -387,42 +387,6 @@ const Temple3D = {
     // White fascia/trim board around the eaves
     roofGroup.add(this.box(rW + 0.1, 0.2, rD + 0.1, C.white, 0, 0.05, 0));
 
-    // Ridge cap along the top (the ridge line running along X)
-    const ridgeHalf = Math.max(0, (rW - rD) / 2);
-    roofGroup.add(this.box(ridgeHalf * 2 + 0.2, 0.12, 0.18, C.roofRidge, 0, rH - 0.02, 0));
-
-    // Vertical ridge lines (song ngoi doc) on all 4 slopes
-    const ridgeSpacing = 0.3;
-
-    // Front and Back slopes: ridges run from ridge down to eaves along Z
-    const slopeFB = Math.sqrt(rH * rH + (rD/2) * (rD/2));
-    const angleFB = Math.atan2(rH, rD / 2);
-
-    for (let rx = -ridgeHalf; rx <= ridgeHalf; rx += ridgeSpacing) {
-      // Front
-      const rF = this.box(0.04, 0.04, slopeFB, C.roofRidge, rx, rH/2 + 0.03, rD/4);
-      rF.rotation.x = -angleFB;
-      roofGroup.add(rF);
-      // Back
-      const rB = this.box(0.04, 0.04, slopeFB, C.roofRidge, rx, rH/2 + 0.03, -rD/4);
-      rB.rotation.x = angleFB;
-      roofGroup.add(rB);
-    }
-
-    // Left and Right hip slopes: ridges run from ridge down to eaves along X
-    const slopeLR = Math.sqrt(rH * rH + (rD/2) * (rD/2));
-    // Left and right hips are triangular, use same angle
-    for (let rz = -rD/2 + 0.3; rz <= rD/2 - 0.3; rz += ridgeSpacing) {
-      // Left
-      const rL = this.box(slopeLR, 0.04, 0.04, C.roofRidge, -rW/2 + rD/4, rH/2 + 0.03, rz);
-      rL.rotation.z = angleFB;
-      roofGroup.add(rL);
-      // Right
-      const rR = this.box(slopeLR, 0.04, 0.04, C.roofRidge, rW/2 - rD/4, rH/2 + 0.03, rz);
-      rR.rotation.z = -angleFB;
-      roofGroup.add(rR);
-    }
-
     this.scene.add(roofGroup);
 
     // ---- CENTRAL WATCHTOWER ----
@@ -501,19 +465,7 @@ const Temple3D = {
     // White collar/trim under tower roof
     towerRoofGroup.add(this.box(trW + 0.05, 0.12, trD + 0.05, C.white, 0, 0.03, 0));
 
-    // Ridge lines on tower roof (smaller, fewer)
-    const trSlopeLen = Math.sqrt(trH * trH + (trD/2) * (trD/2));
-    const trAngle = Math.atan2(trH, trD/2);
-    const trRidgeHalf = Math.max(0, (trW - trD) / 2);
 
-    for (let rx = -trRidgeHalf; rx <= trRidgeHalf; rx += 0.25) {
-      const rf = this.box(0.03, 0.03, trSlopeLen, C.roofRidge, rx, trH/2 + 0.02, trD/4);
-      rf.rotation.x = -trAngle;
-      towerRoofGroup.add(rf);
-      const rb = this.box(0.03, 0.03, trSlopeLen, C.roofRidge, rx, trH/2 + 0.02, -trD/4);
-      rb.rotation.x = trAngle;
-      towerRoofGroup.add(rb);
-    }
 
     this.scene.add(towerRoofGroup);
 
