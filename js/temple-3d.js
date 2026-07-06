@@ -165,6 +165,30 @@ const Temple3D = {
     return mesh;
   },
 
+  // Helper to create recessed windows with shadow depth
+  createRecessedWindow(w, h, color, x, y, z, facing = 'Z') {
+    const group = new THREE.Group();
+    group.position.set(x, y, z);
+
+    if (facing === 'X') {
+      // Outer frame trim
+      const frame = this.createBox(0.12, h + 0.15, w + 0.15, this.COLORS.whiteWall, 0, 0, 0);
+      group.add(frame);
+      // Recessed shutter pane (sitting inside)
+      const pane = this.createBox(0.06, h, w, color, -0.04, 0, 0);
+      group.add(pane);
+    } else {
+      // Outer frame trim
+      const frame = this.createBox(w + 0.15, h + 0.15, 0.12, this.COLORS.whiteWall, 0, 0, 0);
+      group.add(frame);
+      // Recessed shutter pane (sitting inside)
+      const pane = this.createBox(w, h, 0.06, color, 0, 0, -0.04);
+      group.add(pane);
+    }
+
+    return group;
+  },
+
   // ============ PROCEDURAL PALACE GENERATOR ============
   buildPalace() {
     const C = this.COLORS;
@@ -304,34 +328,34 @@ const Temple3D = {
       this.scene.add(pilaster);
     });
 
-    // Facade windows with dark wood shutters (Cửa sổ lá sách)
+    // Facade windows with dark wood shutters (Cửa sổ lá sách lún sâu vào trong)
     // 2 windows on ground floor (below murals)
     const winGW = 0.9;
     const winGH = 1.3;
     const winGY = baseH + 0.1 + winGH/2 + 0.3;
-    this.scene.add(this.createBox(winGW, winGH, 0.05, C.shutterBrown, -wingX, winGY, muralZ));
-    this.scene.add(this.createBox(winGW, winGH, 0.05, C.shutterBrown, wingX, winGY, muralZ));
+    this.scene.add(this.createRecessedWindow(winGW, winGH, C.shutterBrown, -wingX, winGY, muralZ, 'Z'));
+    this.scene.add(this.createRecessedWindow(winGW, winGH, C.shutterBrown, wingX, winGY, muralZ, 'Z'));
 
     // 2 windows on upper floor (above murals)
     const winUY_wing = bY + bH/2 - 1.2;
-    this.scene.add(this.createBox(winGW, winGH, 0.05, C.shutterBrown, -wingX, winUY_wing, muralZ));
-    this.scene.add(this.createBox(winGW, winGH, 0.05, C.shutterBrown, wingX, winUY_wing, muralZ));
+    this.scene.add(this.createRecessedWindow(winGW, winGH, C.shutterBrown, -wingX, winUY_wing, muralZ, 'Z'));
+    this.scene.add(this.createRecessedWindow(winGW, winGH, C.shutterBrown, wingX, winUY_wing, muralZ, 'Z'));
 
     // 2 windows on upper floor (next to central tower)
     const winUY = bY + bH/2 - 1.2;
     const winUX = 4.2;
-    this.scene.add(this.createBox(0.9, 1.4, 0.05, C.shutterBrown, -winUX, winUY, muralZ));
-    this.scene.add(this.createBox(0.9, 1.4, 0.05, C.shutterBrown, winUX, winUY, muralZ));
+    this.scene.add(this.createRecessedWindow(0.9, 1.4, C.shutterBrown, -winUX, winUY, muralZ, 'Z'));
+    this.scene.add(this.createRecessedWindow(0.9, 1.4, C.shutterBrown, winUX, winUY, muralZ, 'Z'));
 
-    // Side windows (small slots on side walls)
+    // Side windows (small slots on side walls - also recessed)
     const sideX = bW/2 + 0.02;
     const sideZOffset = 2.0;
     // Left side slots
-    this.scene.add(this.createBox(0.04, 1.2, 0.4, C.shutterBrown, -sideX, bY - 0.5, sideZOffset));
-    this.scene.add(this.createBox(0.04, 1.2, 0.4, C.shutterBrown, -sideX, bY - 0.5, -sideZOffset));
+    this.scene.add(this.createRecessedWindow(0.4, 1.2, C.shutterBrown, -sideX, bY - 0.5, sideZOffset, 'X'));
+    this.scene.add(this.createRecessedWindow(0.4, 1.2, C.shutterBrown, -sideX, bY - 0.5, -sideZOffset, 'X'));
     // Right side slots
-    this.scene.add(this.createBox(0.04, 1.2, 0.4, C.shutterBrown, sideX, bY - 0.5, sideZOffset));
-    this.scene.add(this.createBox(0.04, 1.2, 0.4, C.shutterBrown, sideX, bY - 0.5, -sideZOffset));
+    this.scene.add(this.createRecessedWindow(0.4, 1.2, C.shutterBrown, sideX, bY - 0.5, sideZOffset, 'X'));
+    this.scene.add(this.createRecessedWindow(0.4, 1.2, C.shutterBrown, sideX, bY - 0.5, -sideZOffset, 'X'));
 
 
     // 6. MAIN HIP ROOF (Mái ngói đỏ chóp xiên)
@@ -384,6 +408,45 @@ const Temple3D = {
     const trimBase = this.createBox(rW - 0.2, 0.2, rD - 0.2, C.whiteWall, 0, 0.05, 0);
     roofGroup.add(trimBase);
 
+    // Add vertical ridges/grooves on the left & right slopes (mái dốc dọc xuống)
+    const slopeLenLR = Math.sqrt(Math.pow(rW/2, 2) + Math.pow(rH, 2));
+    const ridgeSpacing = 0.26;
+    const ridgeCountLR = Math.floor(rD / ridgeSpacing);
+    const angleLR = Math.atan2(rH, rW / 2);
+    
+    for (let i = 0; i <= ridgeCountLR; i++) {
+      const rz = -rD/2 + i * ridgeSpacing;
+      
+      // Left ridges
+      const ridgeL = this.createBox(slopeLenLR - 0.1, 0.04, 0.04, 0x853E2F, -rW/4, rH/2 + 0.08, rz);
+      ridgeL.rotation.z = angleLR;
+      roofGroup.add(ridgeL);
+
+      // Right ridges
+      const ridgeR = this.createBox(slopeLenLR - 0.1, 0.04, 0.04, 0x853E2F, rW/4, rH/2 + 0.08, rz);
+      ridgeR.rotation.z = -angleLR;
+      roofGroup.add(ridgeR);
+    }
+
+    // Add vertical ridges/grooves on front & back slopes
+    const slopeLenFB = Math.sqrt(Math.pow(rD/2, 2) + Math.pow(rH, 2));
+    const ridgeCountFB = Math.floor(rW / ridgeSpacing);
+    const angleFB = Math.atan2(rH, rD / 2);
+
+    for (let i = 0; i <= ridgeCountFB; i++) {
+      const rx = -rW/2 + i * ridgeSpacing;
+
+      // Front ridges
+      const ridgeF = this.createBox(0.04, 0.04, slopeLenFB - 0.1, 0x853E2F, rx, rH/2 + 0.08, rD/4);
+      ridgeF.rotation.x = -angleFB;
+      roofGroup.add(ridgeF);
+
+      // Back ridges
+      const ridgeB = this.createBox(0.04, 0.04, slopeLenFB - 0.1, 0x853E2F, rx, rH/2 + 0.08, -rD/4);
+      ridgeB.rotation.x = angleFB;
+      roofGroup.add(ridgeB);
+    }
+
     this.scene.add(roofGroup);
 
 
@@ -433,16 +496,12 @@ const Temple3D = {
     const tWin2Inner = this.createBox(tWin2W - 0.15, tWin2H - 0.15, 0.08, C.spireGrey, 0, tWin2Y, tD/2 + 0.04);
     this.scene.add(tWin2Inner);
 
-    // Side windows on the tower (Left and Right faces)
+    // Side windows on the tower (Left and Right faces - recessed)
     const tWinY = tY + 0.8;
     const tWinW = 0.8;
     const tWinH = 1.8;
-    // Left side window
-    const tWinL = this.createBox(0.06, tWinH, tWinW, C.shutterBrown, -tW/2 - 0.02, tWinY, 0);
-    this.scene.add(tWinL);
-    // Right side window
-    const tWinR = this.createBox(0.06, tWinH, tWinW, C.shutterBrown, tW/2 + 0.02, tWinY, 0);
-    this.scene.add(tWinR);
+    this.scene.add(this.createRecessedWindow(tWinW, tWinH, C.shutterBrown, -tW/2 - 0.02, tWinY, 0, 'X'));
+    this.scene.add(this.createRecessedWindow(tWinW, tWinH, C.shutterBrown, tW/2 + 0.02, tWinY, 0, 'X'));
 
 
     // 8. TOWER SPIRE / ROOF (Chóp nhọn tháp canh)
