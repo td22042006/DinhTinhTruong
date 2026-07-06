@@ -163,9 +163,9 @@ const Temple3D = {
         this.scene.add(this.model);
 
         // Add a clean cream cover wall on the back (-Z) to hide mirrored front details (photo 2)
-        const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.88;
-        const wallH = scaledBox.getSize(new THREE.Vector3()).y * 0.48; // covers main floor walls under the eave
-        const wallD = 0.6; // thick enough to swallow the duplicate pillars/murals
+        const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.93; // wider to cover fully
+        const wallH = scaledBox.getSize(new THREE.Vector3()).y * 0.58; // taller to reach the eave
+        const wallD = 1.4; // thicker to swallow the duplicate portico canopy and window frames
         const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
         const coverWallMat = new THREE.MeshStandardMaterial({
           color: 0xE6D6B3, // Colonial cream color matching the model texture
@@ -173,8 +173,8 @@ const Temple3D = {
           metalness: 0.05
         });
         const coverWall = new THREE.Mesh(coverWallGeo, coverWallMat);
-        // Position it at the back facade. Adjust Z to be inside the roof eave.
-        coverWall.position.set(0, wallH / 2 + 0.45, -scaledBox.getSize(new THREE.Vector3()).z * 0.36);
+        // Position it closer in Z to swallow everything, Y adjusted for height increase
+        coverWall.position.set(0, wallH / 2 + 0.35, -scaledBox.getSize(new THREE.Vector3()).z * 0.33);
         coverWall.castShadow = true;
         coverWall.receiveShadow = true;
         this.scene.add(coverWall);
