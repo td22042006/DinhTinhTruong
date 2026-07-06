@@ -176,9 +176,9 @@ const Temple3D = {
               tempV.fromBufferAttribute(position, i);
               child.localToWorld(tempV);
 
-              // If vertex is below roof gutter (Y < 6.5) and protrudes at the back (Z < -6.0)
-              if (tempV.y < 6.5 && tempV.z < -6.0) {
-                tempV.z = -6.0; // Flatten to the Z = -6.0 plane
+              // If vertex is below roof gutter (Y < 6.5) and protrudes at the back (Z < -3.6)
+              if (tempV.y < 6.5 && tempV.z < -3.6) {
+                tempV.z = -3.6; // Flatten to the Z = -3.6 plane
                 child.worldToLocal(tempV);
                 position.setXYZ(i, tempV.x, tempV.y, tempV.z);
               }
@@ -188,10 +188,10 @@ const Temple3D = {
           }
         });
 
-        // Add a super thin plaster wall (0.05 units thick) over the flattened back to hide old textures
+        // Add a plaster wall (0.6 units thick) to close the back cavity and side gaps perfectly
         const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.94; // fits perfectly to side walls
         const wallH = 6.4; // height to reach and touch the underside of the roof eave (up to Y=6.5)
-        const wallD = 0.05; // thin flat wall
+        const wallD = 0.6; // thickness to fill the side gap between original corner (-3.0) and roof eave (-3.6)
         const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
         const coverWallMat = new THREE.MeshStandardMaterial({
           color: 0xE7D5BC, // Bright warm cream matching front facade color
@@ -199,8 +199,9 @@ const Temple3D = {
           metalness: 0.05
         });
         const coverWall = new THREE.Mesh(coverWallGeo, coverWallMat);
-        // Positioned at Z = -6.03 (just behind the flattened Z = -6.0 plane)
-        coverWall.position.set(0, wallH / 2 + 0.1, -6.03);
+        // Positioned at Z = -3.3 so the back face aligns perfectly at -3.6 under the roof gutter,
+        // and the front face starts at -3.0 overlapping the side walls to close all side gaps.
+        coverWall.position.set(0, wallH / 2 + 0.1, -3.3);
         coverWall.castShadow = true;
         coverWall.receiveShadow = true;
         this.scene.add(coverWall);
