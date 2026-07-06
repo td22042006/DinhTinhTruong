@@ -162,19 +162,44 @@ const Temple3D = {
 
         this.scene.add(this.model);
 
-        // Add a clean cream cover wall on the back (-Z) to hide mirrored front details (photo 2)
-        const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.93; // narrowed by 0.2 on each side (ratio 0.93)
-        const wallH = scaledBox.getSize(new THREE.Vector3()).y * 0.38; // lowered height to prevent roof clipping
-        const wallD = 6.4; // thickened to 6.4 (+1.0) to fully swallow the canopy
+        // Force update matrices to get accurate world coordinates
+        this.model.updateMatrixWorld(true);
+
+        // Flatten the back duplicate canopy, pillars, and details dynamically in world coordinates
+        this.model.traverse((child) => {
+          if (child.isMesh) {
+            const geometry = child.geometry;
+            const position = geometry.attributes.position;
+            const tempV = new THREE.Vector3();
+
+            for (let i = 0; i < position.count; i++) {
+              tempV.fromBufferAttribute(position, i);
+              child.localToWorld(tempV);
+
+              // If vertex is below roof gutter (Y < 5.1) and protrudes at the back (Z < -3.05)
+              if (tempV.y < 5.1 && tempV.z < -3.05) {
+                tempV.z = -3.05; // Flatten to the wall plane
+                child.worldToLocal(tempV);
+                position.setXYZ(i, tempV.x, tempV.y, tempV.z);
+              }
+            }
+            position.needsUpdate = true;
+            geometry.computeVertexNormals();
+          }
+        });
+
+        // Add a super thin plaster wall (0.05 units thick) over the flattened back to hide old textures
+        const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.94; // fits perfectly to side walls
+        const wallH = 5.0; // from ground to roof gutter height
+        const wallD = 0.05; // extremely thin to look completely flat and flush (no box backpack)
         const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
         const coverWallMat = new THREE.MeshStandardMaterial({
-          color: 0xE7D5BC, // Bright warm cream skin tone matching the front facade
+          color: 0xE7D5BC, // Bright warm cream matching front facade color
           roughness: 0.9,
           metalness: 0.05
         });
         const coverWall = new THREE.Mesh(coverWallGeo, coverWallMat);
-        // Positioned lower in Y and adjusted in Z to blend seamlessly with the building core
-        coverWall.position.set(0, wallH / 2 + 0.1, -scaledBox.getSize(new THREE.Vector3()).z * 0.28);
+        coverWall.position.set(0, wallH / 2 + 0.1, -3.08); // Placed exactly on the flattened plane
         coverWall.castShadow = true;
         coverWall.receiveShadow = true;
         this.scene.add(coverWall);
