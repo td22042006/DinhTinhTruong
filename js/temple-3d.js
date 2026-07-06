@@ -164,8 +164,8 @@ const Temple3D = {
 
         // Add a clean cream cover wall on the back (-Z) to hide mirrored front details (photo 2)
         const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.93; // wider to cover fully
-        const wallH = scaledBox.getSize(new THREE.Vector3()).y * 0.58; // taller to reach the eave
-        const wallD = 1.4; // thicker to swallow the duplicate portico canopy and window frames
+        const wallH = scaledBox.getSize(new THREE.Vector3()).y * 0.46; // lower height to avoid clipping roof tiles
+        const wallD = 2.2; // much thicker to fully absorb the canopy and windows
         const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
         const coverWallMat = new THREE.MeshStandardMaterial({
           color: 0xE6D6B3, // Colonial cream color matching the model texture
@@ -173,8 +173,8 @@ const Temple3D = {
           metalness: 0.05
         });
         const coverWall = new THREE.Mesh(coverWallGeo, coverWallMat);
-        // Position it closer in Z to swallow everything, Y adjusted for height increase
-        coverWall.position.set(0, wallH / 2 + 0.35, -scaledBox.getSize(new THREE.Vector3()).z * 0.33);
+        // Positioned lower and shifted outward in Z to cover the canopy safely
+        coverWall.position.set(0, wallH / 2 + 0.4, -scaledBox.getSize(new THREE.Vector3()).z * 0.37);
         coverWall.castShadow = true;
         coverWall.receiveShadow = true;
         this.scene.add(coverWall);
