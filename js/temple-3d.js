@@ -264,106 +264,103 @@ const Temple3D = {
     // White base band
     this.scene.add(this.box(bW + 0.15, 0.2, bD + 0.15, C.white, 0, topBase + 0.1, 0));
 
-    // ---- FRONT PORTICO (Sảnh cột trước) ----
-    // Central entrance area that protrudes forward with columns
-    const pW = 7.5;   // portico width
-    const pD = 1.6;   // portico depth (how far it sticks out)
-    const pH = 5.0;   // portico height
+    // ---- FRONT PORTICO (Sanh cot truoc) ----
+    const pW = 7.5;
+    const pD = 1.6;
+    const pH = 5.0;
     const pZ = bD/2 + pD/2;
 
-    // Portico back wall (alcove behind columns)
+    // Portico back wall
     this.scene.add(this.box(pW - 0.3, pH, pD - 0.2, C.cream, 0, topBase + pH/2, pZ - 0.3));
 
-    // Flat canopy/entablature on top of columns
+    // Flat canopy on top
     this.scene.add(this.box(pW + 0.5, 0.3, pD + 0.5, C.white, 0, topBase + pH, pZ));
 
-    // 6 columns (matching front photo - ~6 visible columns)
-    const colCount = 6;
-    const colSpacing = (pW - 0.8) / (colCount - 1);
-    const colR = 0.18;
-    const colH = pH - 0.4;
+    // 4 tall pilaster columns flanking entrance (matching photo 3)
+    const colR = 0.2;
+    const colH = pH - 0.3;
     const colZ = pZ + pD/2 - 0.15;
-
-    for (let i = 0; i < colCount; i++) {
-      const cx = -(pW - 0.8)/2 + i * colSpacing;
-      // Column shaft
+    const colPositions = [-3.0, -1.2, 1.2, 3.0];
+    colPositions.forEach(cx => {
       this.scene.add(this.cyl(colR, colR * 1.1, colH, C.pilaster, cx, topBase + colH/2 + 0.1, colZ, 12));
-      // Column base
       this.scene.add(this.box(colR * 3, 0.12, colR * 3, C.stone, cx, topBase + 0.06, colZ));
-      // Column capital
       this.scene.add(this.box(colR * 2.8, 0.1, colR * 2.8, C.white, cx, topBase + colH + 0.05, colZ));
-    }
+    });
 
-    // Entrance doors (behind columns)
+    // Central large double door (cua go nau lon)
     const doorZ = pZ + pD/2 - 0.02;
-    // Central double door
-    this.scene.add(this.box(1.3, 2.3, 0.08, C.shutterBrown, 0, topBase + 1.15, doorZ));
-    // Side doors
-    this.scene.add(this.box(0.8, 1.8, 0.08, C.shutterBrown, -2.2, topBase + 0.9, doorZ));
-    this.scene.add(this.box(0.8, 1.8, 0.08, C.shutterBrown,  2.2, topBase + 0.9, doorZ));
+    this.scene.add(this.box(1.8, 2.8, 0.08, C.shutterBrown, 0, topBase + 1.4, doorZ));
+    // Door frame
+    this.scene.add(this.box(2.0, 3.0, 0.04, C.white, 0, topBase + 1.5, doorZ - 0.03));
 
-    // ---- SIGN BOARD (Bien hieu) ----
+    // 2 dark panels flanking the door (visible in photo 3 - between inner columns)
+    this.scene.add(this.box(1.2, 2.0, 0.06, C.windowDark, -2.1, topBase + 1.3, doorZ));
+    this.scene.add(this.box(1.2, 2.0, 0.06, C.windowDark,  2.1, topBase + 1.3, doorZ));
+    // Panel frames
+    this.scene.add(this.box(1.35, 2.15, 0.03, C.white, -2.1, topBase + 1.3, doorZ - 0.03));
+    this.scene.add(this.box(1.35, 2.15, 0.03, C.white,  2.1, topBase + 1.3, doorZ - 0.03));
+
+    // Sign board above entrance
     const signY = topBase + pH - 0.4;
-    this.scene.add(this.box(3.2, 0.5, 0.06, C.signBlue, 0, signY, colZ + 0.1));
-    this.scene.add(this.box(2.9, 0.3, 0.02, C.textGold, 0, signY, colZ + 0.14));
+    this.scene.add(this.box(3.8, 0.45, 0.06, C.signBlue, 0, signY, colZ + 0.1));
+    this.scene.add(this.box(3.5, 0.25, 0.02, C.textGold, 0, signY, colZ + 0.14));
 
     // ---- FACADE PILASTERS (Tru bo tuong) ----
-    // Vertical red-brown strips on the facade, as seen in front photo
+    // Thick tall red-brown pilasters on facade (matching photo 3)
     const pilH = bH;
-    const pilW = 0.22;
-    const pilD = 0.12;
+    const pilW = 0.35;
+    const pilD = 0.15;
     const pilZ = bD/2 + pilD/2;
     const pilY = topBase + pilH/2;
-
-    // Inner pilasters flanking portico
-    [-pW/2 - 0.3, pW/2 + 0.3].forEach(px => {
-      this.scene.add(this.box(pilW, pilH, pilD, C.pilaster, px, pilY, pilZ));
-    });
-
-    // Wing pilasters (2 on each wing, visible in front photo)
-    const wingPilasters = [-8.2, -6.0, 6.0, 8.2];
-    wingPilasters.forEach(px => {
-      this.scene.add(this.box(pilW, pilH, pilD, C.pilaster, px, pilY, pilZ));
-    });
-
-    // Corner pilasters on front corners
-    [-bW/2 + 0.12, bW/2 - 0.12].forEach(px => {
-      this.scene.add(this.box(pilW, pilH, pilD, C.pilaster, px, pilY, pilZ));
-    });
-
-    // ---- FRONT FACADE WINDOWS ----
-    // Ground floor windows on wings (2 per wing, 4 total)
-    const winW = 0.85;
-    const winH = 1.2;
-    const gndWinY = topBase + winH/2 + 0.4;
     const facadeZ = bD/2 + 0.06;
 
-    // Left wing windows
-    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown, -7.1, gndWinY, facadeZ, 'Z'));
-    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown, -9.0, gndWinY, facadeZ, 'Z'));
-    // Right wing windows
-    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown,  7.1, gndWinY, facadeZ, 'Z'));
-    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown,  9.0, gndWinY, facadeZ, 'Z'));
+    // Pilasters flanking the portico opening
+    [-pW/2 - 0.2, pW/2 + 0.2].forEach(px => {
+      this.scene.add(this.box(pilW, pilH, pilD, C.pilaster, px, pilY, pilZ));
+    });
 
-    // Upper floor windows on wings
-    const upWinY = topBase + bH - winH/2 - 0.5;
-    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown, -7.1, upWinY, facadeZ, 'Z'));
-    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown,  7.1, upWinY, facadeZ, 'Z'));
+    // Wing pilasters (2 per wing)
+    [-8.5, -5.8, 5.8, 8.5].forEach(px => {
+      this.scene.add(this.box(pilW, pilH, pilD, C.pilaster, px, pilY, pilZ));
+    });
 
-    // ---- TRANH TUONG (Murals) on wings ----
-    // Left mural (warm tones)
-    const muralW = 2.8;
-    const muralH = 1.4;
-    const muralY = topBase + bH/2 + 0.2;
-    this.scene.add(this.box(muralW + 0.2, muralH + 0.2, 0.03, C.white, -7.1, muralY, facadeZ - 0.01));
-    this.scene.add(this.box(muralW, muralH, 0.04, 0x8A453B, -7.1, muralY, facadeZ + 0.01));
+    // Corner pilasters
+    [-bW/2 + 0.18, bW/2 - 0.18].forEach(px => {
+      this.scene.add(this.box(pilW, pilH, pilD, C.pilaster, px, pilY, pilZ));
+    });
 
-    // Right mural (cool tones)
-    this.scene.add(this.box(muralW + 0.2, muralH + 0.2, 0.03, C.white, 7.1, muralY, facadeZ - 0.01));
-    this.scene.add(this.box(muralW, muralH, 0.04, 0x3F6A75, 7.1, muralY, facadeZ + 0.01));
+    // ---- WING WINDOWS (ground floor) ----
+    const winW = 0.85;
+    const winH = 1.2;
+    const gndWinY = topBase + winH/2 + 0.35;
 
-    // ---- SIDE WALLS detail ----
-    // Small recessed windows on side walls (visible in back/side photos)
+    // Left wing
+    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown, -7.15, gndWinY, facadeZ, 'Z'));
+    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown, -9.2, gndWinY, facadeZ, 'Z'));
+    // Right wing
+    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown,  7.15, gndWinY, facadeZ, 'Z'));
+    this.scene.add(this.recessedWin(winW, winH, C.shutterBrown,  9.2, gndWinY, facadeZ, 'Z'));
+
+    // ---- TRANH TUONG (Murals) on wings with shelf brackets ----
+    const muralW = 3.0;
+    const muralH = 1.5;
+    const muralY = topBase + bH/2 + 0.6;
+
+    // Left mural
+    this.scene.add(this.box(muralW + 0.2, muralH + 0.2, 0.03, C.white, -7.15, muralY, facadeZ - 0.01));
+    this.scene.add(this.box(muralW, muralH, 0.05, 0x8A453B, -7.15, muralY, facadeZ + 0.01));
+    // Left shelf bracket (gia do hinh thang)
+    this.scene.add(this.box(muralW * 0.6, 0.12, 0.25, C.cream, -7.15, muralY - muralH/2 - 0.08, facadeZ + 0.1));
+    this.scene.add(this.box(muralW * 0.4, 0.35, 0.2, C.cream, -7.15, muralY - muralH/2 - 0.28, facadeZ + 0.08));
+
+    // Right mural
+    this.scene.add(this.box(muralW + 0.2, muralH + 0.2, 0.03, C.white, 7.15, muralY, facadeZ - 0.01));
+    this.scene.add(this.box(muralW, muralH, 0.05, 0x3F6A75, 7.15, muralY, facadeZ + 0.01));
+    // Right shelf bracket
+    this.scene.add(this.box(muralW * 0.6, 0.12, 0.25, C.cream, 7.15, muralY - muralH/2 - 0.08, facadeZ + 0.1));
+    this.scene.add(this.box(muralW * 0.4, 0.35, 0.2, C.cream, 7.15, muralY - muralH/2 - 0.28, facadeZ + 0.08));
+
+    // ---- SIDE WALLS ----
     const sideX = bW/2 + 0.02;
     const sideWinY = topBase + bH/2;
     [-2.5, 0, 2.5].forEach(sz => {
@@ -371,11 +368,11 @@ const Temple3D = {
       this.scene.add(this.recessedWin(0.5, 1.0, C.shutterBrown,  sideX, sideWinY, sz, 'X'));
     });
 
-    // ---- MAIN HIP ROOF ----
-    const roofOverhang = 1.0;
-    const rW = bW + roofOverhang * 2;  // 22
-    const rD = bD + roofOverhang * 2;  // 11
-    const rH = 2.8;
+    // ---- MAIN HIP ROOF (mai thoai nhu anh 1) ----
+    const roofOverhang = 1.4;
+    const rW = bW + roofOverhang * 2;  // ~23
+    const rD = bD + roofOverhang * 2;  // ~12
+    const rH = 1.6;  // low/gentle slope like photo 1
     const rY = topBase + bH;
 
     const roofGroup = new THREE.Group();
@@ -384,8 +381,12 @@ const Temple3D = {
     // Main solid hip roof
     roofGroup.add(this.hipRoof(rW, rH, rD, C.roofTerra, 0, 0, 0));
 
-    // White fascia/trim board around the eaves
-    roofGroup.add(this.box(rW + 0.1, 0.2, rD + 0.1, C.white, 0, 0.05, 0));
+    // White fascia/trim board around all eaves (visible in photo 1)
+    roofGroup.add(this.box(rW + 0.15, 0.25, rD + 0.15, C.white, 0, 0.06, 0));
+
+    // White trim along top ridge
+    const ridgeHalf = Math.max(0, (rW - rD) / 2);
+    roofGroup.add(this.box(ridgeHalf * 2 + 0.3, 0.12, 0.2, C.white, 0, rH - 0.02, 0));
 
     this.scene.add(roofGroup);
 
@@ -450,50 +451,33 @@ const Temple3D = {
     // Tower back - simple, clean (as in back photo)
     // No extra decoration needed, the cream box is already there
 
-    // ---- TOWER SMALL HIP ROOF ----
-    // Small hip roof on top of tower (visible in all photos - terracotta colored)
-    const trW = tW + 0.6;
-    const trD = tD + 0.6;
-    const trH = 1.2;
-    const trY = tBase + tH;
+    // ---- TOWER TOP: Square collar + tall pyramid spire (anh 2) ----
+    // No small hip roof - just a wide square trim collar then pyramid
+    const spireBase = tBase + tH;
+    const spireH = 4.5;  // tall pointed pyramid
 
-    const towerRoofGroup = new THREE.Group();
-    towerRoofGroup.position.set(0, trY, 0);
+    // Wide square collar/trim base (visible in photo 2)
+    this.scene.add(this.box(tW + 0.5, 0.3, tD + 0.5, C.white, 0, spireBase + 0.15, 0));
+    // Second thinner collar
+    this.scene.add(this.box(tW + 0.1, 0.15, tD + 0.1, C.white, 0, spireBase + 0.38, 0));
 
-    towerRoofGroup.add(this.hipRoof(trW, trH, trD, C.roofTerra, 0, 0, 0));
+    // Tall pyramid spire directly on collar (cream colored, like photo 2)
+    this.scene.add(this.pyramid(tW * 0.7, spireH, C.spire, 0, spireBase + 0.45, 0));
 
-    // White collar/trim under tower roof
-    towerRoofGroup.add(this.box(trW + 0.05, 0.12, trD + 0.05, C.white, 0, 0.03, 0));
-
-
-
-    this.scene.add(towerRoofGroup);
-
-    // ---- SPIRE (Chop nhon) ----
-    // Pointed pyramid spire on top of tower roof (cream/beige colored)
-    const spireBase = trY + trH;
-    const spireH = 3.5;
-
-    // Collar/trim between tower roof and spire
-    this.scene.add(this.box(tW * 0.55, 0.25, tD * 0.55, C.white, 0, spireBase + 0.12, 0));
-
-    // Pyramidal spire
-    this.scene.add(this.pyramid(tW * 0.5, spireH, C.spire, 0, spireBase + 0.25, 0));
-
-    // Trim edges on spire corners (4 lines)
-    const spireCornerDist = tW * 0.25 * 0.5;
-    const spireEdgeLen = Math.sqrt(spireH * spireH + spireCornerDist * spireCornerDist * 2) + 0.2;
-    const spireEdgeAngle = Math.atan2(spireCornerDist, spireH);
+    // Trim edges on 4 corners of pyramid
+    const spireSize = tW * 0.7 * 0.5;
+    const spireEdgeLen = Math.sqrt(spireH * spireH + spireSize * spireSize) + 0.1;
+    const spireEdgeAngle = Math.atan2(spireSize * 0.707, spireH);
 
     for (let i = 0; i < 4; i++) {
       const a = (i * Math.PI) / 2 + Math.PI / 4;
-      const ex = Math.cos(a) * spireCornerDist * 0.5;
-      const ez = Math.sin(a) * spireCornerDist * 0.5;
+      const ex = Math.cos(a) * spireSize * 0.35;
+      const ez = Math.sin(a) * spireSize * 0.35;
       const edge = new THREE.Mesh(
-        new THREE.BoxGeometry(0.06, spireEdgeLen, 0.06),
+        new THREE.BoxGeometry(0.07, spireEdgeLen, 0.07),
         this.mat(C.spireTrim, { roughness: 0.5 })
       );
-      edge.position.set(ex, spireBase + 0.25 + spireH/2, ez);
+      edge.position.set(ex, spireBase + 0.45 + spireH/2, ez);
       edge.rotation.y = -a;
       if (i === 0) edge.rotation.z = spireEdgeAngle;
       if (i === 1) edge.rotation.x = -spireEdgeAngle;
@@ -502,9 +486,6 @@ const Temple3D = {
       edge.castShadow = true;
       this.scene.add(edge);
     }
-
-    // Metal tip at very top
-    this.scene.add(this.cyl(0.02, 0.04, 0.6, 0x888888, 0, spireBase + 0.25 + spireH + 0.3, 0, 6));
   },
 
   // ============ HOTSPOTS ============
