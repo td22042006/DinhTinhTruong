@@ -176,9 +176,9 @@ const Temple3D = {
               tempV.fromBufferAttribute(position, i);
               child.localToWorld(tempV);
 
-              // If vertex is below roof gutter height (Y < 6.5) and protrudes at the back (Z < -3.05)
-              if (tempV.y < 6.5 && tempV.z < -3.05) {
-                tempV.z = -3.05; // Flatten to the original back wall plane
+              // If vertex is below roof gutter (Y < 6.5) and protrudes at the back (Z < -6.0)
+              if (tempV.y < 6.5 && tempV.z < -6.0) {
+                tempV.z = -6.0; // Flatten to the Z = -6.0 plane
                 child.worldToLocal(tempV);
                 position.setXYZ(i, tempV.x, tempV.y, tempV.z);
               }
@@ -187,6 +187,23 @@ const Temple3D = {
             geometry.computeVertexNormals();
           }
         });
+
+        // Add a super thin plaster wall (0.05 units thick) over the flattened back to hide old textures
+        const wallW = scaledBox.getSize(new THREE.Vector3()).x * 0.94; // fits perfectly to side walls
+        const wallH = 6.4; // height to reach and touch the underside of the roof eave (up to Y=6.5)
+        const wallD = 0.05; // thin flat wall
+        const coverWallGeo = new THREE.BoxGeometry(wallW, wallH, wallD);
+        const coverWallMat = new THREE.MeshStandardMaterial({
+          color: 0xE7D5BC, // Bright warm cream matching front facade color
+          roughness: 0.9,
+          metalness: 0.05
+        });
+        const coverWall = new THREE.Mesh(coverWallGeo, coverWallMat);
+        // Positioned at Z = -6.03 (just behind the flattened Z = -6.0 plane)
+        coverWall.position.set(0, wallH / 2 + 0.1, -6.03);
+        coverWall.castShadow = true;
+        coverWall.receiveShadow = true;
+        this.scene.add(coverWall);
 
         // Update controls target to model center
         this.controls.target.set(0, scaledBox.getSize(new THREE.Vector3()).y / 2, 0);
